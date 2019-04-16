@@ -25,10 +25,10 @@
       renderer.setSize(sceneWidth, sceneHeight);
       document.body.appendChild(renderer.domElement);
       var light = getLight();
-      var leftBorder = getBorder("left", 1, 20, 2, -5, 0, 0);
-      var rightBorder = getBorder("right", 1, 20, 2, 5, 0, 0);
-      var topBorder = getBorder("top", 3, 1, 2, 0, 10, 0);
-      var downBorder = getBorder("down", 3, 1, 2, 0, -9.5, 0);
+      var leftBorder = getBorder("left", 1, 25, 1, -7.5, 0, 0);
+      var rightBorder = getBorder("right", 1, 25, 1, 7.5, 0, 0);
+      var topBorder = getBorder("top", 3, 1, 1, 0, 11.5, 0);
+      var downBorder = getBorder("down", 3, 1, 1, 0, -11.5, 0);
       var sphere = getSphere();
       var floor = getFloor();
       scene.add(light);
@@ -49,16 +49,25 @@
       window.onkeydown = (event) => {
       //--Para usar sólo tú la tecla y que no la pueda utilizar el navegador
         event.preventDefault();
-        n = 1;
         if (event.key == "ArrowLeft") {
-          borders[3].position.x -= 1;
+          if ((borders[3].position.x - 0.5 - borders[3].geometry.parameters.width/2) >= borders[0].position.x + borders[0].geometry.parameters.width/2){
+            borders[3].position.x -= 0.5;
+          }
         }
         if (event.key == "ArrowRight") {
-          borders[3].position.x += 1;
+          if ((borders[3].position.x + 0.5 + borders[3].geometry.parameters.width/2) <= borders[1].position.x - borders[1].geometry.parameters.width/2){
+            borders[3].position.x += 0.5;
+          }
         }
       }
 
       sphere.position.x += stepX;
+      if (sphere.position.x > borders[2].position.x){
+        if ((borders[2].position.x + borders[2].geometry.parameters.width/2) <= borders[1].position.x - borders[1].geometry.parameters.width/2){
+          borders[2].position.x = sphere.position.x;
+        }
+      }
+      borders[2].position.x = sphere.position.x;
       //sphere.position.y += stepY;
       renderer.render(scene, camera);
       requestAnimationFrame(function() {
@@ -117,7 +126,7 @@
 
 
    function getFloor() {
-      var geometry = new THREE.PlaneGeometry(10, 20);
+      var geometry = new THREE.PlaneGeometry(15, 25);
       var mesh = new THREE.Mesh(geometry, getWoodMaterial());
       mesh.receiveShadow = true;
       return mesh;
