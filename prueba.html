@@ -9,7 +9,7 @@
 <script>
 
 
-   var stepX = 0.15;
+   var stepX = 0.05;
    var stepY = 0.25;
    function init() {
       var scene = new THREE.Scene();
@@ -62,12 +62,19 @@
       }
 
       sphere.position.x += stepX;
-      if (sphere.position.x > borders[2].position.x){
-        if ((borders[2].position.x + borders[2].geometry.parameters.width/2) <= borders[1].position.x - borders[1].geometry.parameters.width/2){
+      if (sphere.position.x >= borders[2].position.x){
+        if ((sphere.position.x + borders[2].geometry.parameters.width/2) <= (borders[1].position.x - borders[1].geometry.parameters.width/2)){
           borders[2].position.x = sphere.position.x;
         }
       }
-      borders[2].position.x = sphere.position.x;
+
+      if (sphere.position.x < borders[2].position.x){
+        if ((sphere.position.x - borders[2].geometry.parameters.width/2) >= (borders[0].position.x + borders[0].geometry.parameters.width/2)){
+          borders[2].position.x = sphere.position.x;
+        }
+      }
+
+
       //sphere.position.y += stepY;
       renderer.render(scene, camera);
       requestAnimationFrame(function() {
