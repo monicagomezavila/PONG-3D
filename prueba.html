@@ -10,7 +10,7 @@
 
 
    var stepX = 0.05;
-   var stepY = 0.25;
+   var stepY = 0.15;
    function init() {
       var scene = new THREE.Scene();
       var sceneWidth = window.innerWidth;
@@ -61,7 +61,11 @@
         }
       }
 
+
       sphere.position.x += stepX;
+      sphere.position.y += stepY;
+
+
       if (sphere.position.x >= borders[2].position.x){
         if ((sphere.position.x + borders[2].geometry.parameters.width/2) <= (borders[1].position.x - borders[1].geometry.parameters.width/2)){
           borders[2].position.x = sphere.position.x;
@@ -74,8 +78,11 @@
         }
       }
 
+      if (sphere.position.y<borders[2].position.y*(-1)){
+        sphere.position.y = 0;
+      }
 
-      //sphere.position.y += stepY;
+
       renderer.render(scene, camera);
       requestAnimationFrame(function() {
          animate(sphere, borders, renderer, scene, camera);
@@ -122,7 +129,7 @@
 
 
    function getSphere() {
-      var geometry = new THREE.SphereGeometry(1, 20, 20);
+      var geometry = new THREE.SphereGeometry(0.7, 20, 20);
       var material = new THREE.MeshNormalMaterial();
       var mesh = new THREE.Mesh(geometry, material);
       mesh.position.z = 1;
