@@ -11,6 +11,7 @@
 
    var stepX = 0.05;
    var stepY = 0.15;
+   var begin = false;
    function init() {
       var scene = new THREE.Scene();
       var sceneWidth = window.innerWidth;
@@ -44,6 +45,7 @@
 
 
    function animate(sphere, borders, renderer, scene, camera) {
+
       checkCollision(sphere, borders);
 
       window.onkeydown = (event) => {
@@ -59,11 +61,16 @@
             borders[3].position.x += 0.5;
           }
         }
+
+        if (event.key == " "){
+          begin = true;
+        }
       }
 
-
+      if (begin == true){
       sphere.position.x += stepX;
       sphere.position.y += stepY;
+      }
 
 
       if (sphere.position.x >= borders[2].position.x){
@@ -80,6 +87,8 @@
 
       if (sphere.position.y<borders[2].position.y*(-1)){
         sphere.position.y = 0;
+        sphere.position.x = 0;
+        begin = false;
       }
 
 
@@ -132,7 +141,6 @@
       var geometry = new THREE.SphereGeometry(0.7, 20, 20);
       var material = new THREE.MeshNormalMaterial();
       var mesh = new THREE.Mesh(geometry, material);
-      mesh.position.z = 1;
       mesh.castShadow = true;
       mesh.name = "sphere";
       return mesh;
