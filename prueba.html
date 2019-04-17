@@ -11,7 +11,10 @@
 
    var stepX = 0.05;
    var stepY = 0.15;
+   //--Boolean que empieza el juego si le das a la tecla de espacio
    var begin = false;
+
+
    function init() {
       var scene = new THREE.Scene();
       var sceneWidth = window.innerWidth;
@@ -22,6 +25,7 @@
       var renderer = new THREE.WebGLRenderer({
          antialias : true
       });
+
       renderer.shadowMap.enabled = true;
       renderer.setSize(sceneWidth, sceneHeight);
       document.body.appendChild(renderer.domElement);
@@ -52,17 +56,14 @@
       //--Para usar sólo tú la tecla y que no la pueda utilizar el navegador
         event.preventDefault();
         if (event.key == "ArrowLeft") {
-          if ((borders[3].position.x - 0.5 - borders[3].geometry.parameters.width/2) >= borders[0].position.x + borders[0].geometry.parameters.width/2){
-            borders[3].position.x -= 0.5;
-          }
+          racketMoveLeft(borders[3].position.x, borders[3], borders[0])
         }
         if (event.key == "ArrowRight") {
-          if ((borders[3].position.x + 0.5 + borders[3].geometry.parameters.width/2) <= borders[1].position.x - borders[1].geometry.parameters.width/2){
-            borders[3].position.x += 0.5;
-          }
+          racketMoveRight(borders[3].position.x, borders[3], borders[1])
         }
 
         if (event.key == " "){
+          //--Comenzará a moverse la bola
           begin = true;
         }
       }
@@ -74,21 +75,24 @@
 
 
       if (sphere.position.x >= borders[2].position.x){
-        if ((sphere.position.x + borders[2].geometry.parameters.width/2) <= (borders[1].position.x - borders[1].geometry.parameters.width/2)){
-          borders[2].position.x = sphere.position.x;
-        }
+        racketMoveRight(sphere.position.x,borders[2],borders[1]);
       }
 
       if (sphere.position.x < borders[2].position.x){
-        if ((sphere.position.x - borders[2].geometry.parameters.width/2) >= (borders[0].position.x + borders[0].geometry.parameters.width/2)){
-          borders[2].position.x = sphere.position.x;
-        }
+        racketMoveLeft(sphere.position.x,borders[2], borders[0])
       }
 
       if (sphere.position.y<borders[2].position.y*(-1)){
         sphere.position.y = 0;
         sphere.position.x = 0;
         begin = false;
+        if (document.getElementById("cpu").innerHTML == 5){
+          document.getElementById("cpu").innerHTML = 0;
+          document.getElementById("winner").innerHTML = "the winner is CPU";
+          Letter();
+        }else{
+          document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
+        }
       }
 
 
@@ -98,6 +102,26 @@
       });
    }
 
+
+   function racketMoveLeft(position_init,racket, wall, move){
+     //--Desplazamiento de la raqueta
+     var move = 0.25;
+     var position_end_racket = position_init - racket.geometry.parameters.width/2;
+     var position_end_wall = wall.position.x + wall.geometry.parameters.width/2;
+     if (position_end_racket - move >= position_end_wall){
+       racket.position.x -= move;
+     }
+   }
+
+   function racketMoveRight(position_init, racket, wall){
+     //--Desplazamiento de la raqueta
+     var move = 0.25;
+     var position_end_racket = position_init + racket.geometry.parameters.width/2;
+     var position_end_wall = wall.position.x - wall.geometry.parameters.width/2;
+     if (position_end_racket + move <= position_end_wall){
+       racket.position.x += move;
+     }
+   }
 
    function checkCollision(sphere, borders) {
       var originPosition = sphere.position.clone();
@@ -123,7 +147,7 @@
 
    function getLight() {
       var light = new THREE.DirectionalLight();
-      light.position.set(4, 4, 4);
+      light.position.set(5, 3, 5);
       light.castShadow = true;
       light.shadow.camera.near = 0;
       light.shadow.camera.far = 16;
@@ -166,6 +190,7 @@
       mesh.receiveShadow = true;
       mesh.position.set(posX, posY, posZ);
       mesh.name = name;
+      mesh.receiveShadow = true;
       return mesh;
    }
 
@@ -182,20 +207,23 @@
    }
 
    function getOtherMaterial(){
-     var texture = new THREE.TextureLoader().load("texture.png");
+     var texture = new THREE.TextureLoader().load("skin2.jpg");
      var material = new THREE.MeshPhysicalMaterial({
         map : texture
      });
-     material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
-     material.map.repeat.set(4, 4);
      material.side = THREE.DoubleSide;
      return material;
    }
+
+
 
 </script>
 </head>
 
 <body onload="init()">
+  <p id = "cpu">0</p>
+  <p id = "player1">0</p>
+  <p id = "winner"></p>
 </body>
 
 </html>
