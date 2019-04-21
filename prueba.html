@@ -2,15 +2,16 @@
 <html>
 
 <head>
-<title>Three.js: Collision detection</title>
+<title>Three.js: PONG-3D</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/103/three.min.js"></script>
 
 <script>
 
-
-   var stepX = 0.05;
-   var stepY = 0.15;
+   //--Movimiento bola
+   aleatorio = numAleatorio()
+   var stepX = 0.05 * aleatorio;
+   var stepY = 0.15 * aleatorio;
    //--Boolean que empieza el juego si le das a la tecla de espacio
    var begin = false;
 
@@ -32,20 +33,21 @@
       var light = getLight();
       var leftBorder = getBorder("left", 1, 25, 1, -7.5, 0, 0);
       var rightBorder = getBorder("right", 1, 25, 1, 7.5, 0, 0);
-      var topBorder = getBorder("top", 3, 1, 1, 0, 11.5, 0);
-      var downBorder = getBorder("down", 3, 1, 1, 0, -11.5, 0);
+      var CPU = getBorder("top", 3, 1, 1, 0, 11.5, 0);
+      var USER = getBorder("down", 3, 1, 1, 0, -11.5, 0);
       var sphere = getSphere();
       var floor = getFloor();
       scene.add(light);
       scene.add(leftBorder);
       scene.add(rightBorder);
-      scene.add(topBorder);
-      scene.add(downBorder);
+      scene.add(CPU);
+      scene.add(USER);
       scene.add(sphere);
       scene.add(floor);
-      var borders = [ leftBorder, rightBorder, topBorder, downBorder ];
+      var borders = [ leftBorder, rightBorder, CPU, USER ];
       animate(sphere, borders, renderer, scene, camera);
    }
+
 
 
    function animate(sphere, borders, renderer, scene, camera) {
@@ -65,12 +67,21 @@
         if (event.key == " "){
           //--Comenzará a moverse la bola
           begin = true;
+          if (document.getElementById("cpu").innerHTML == 5){
+            document.getElementById("cpu").innerHTML = 0;
+          }else if (document.getElementById("player1").innerHTML == 5) {
+            document.getElementById("cpu").innerHTML = 0;
+          }
+          document.getElementById("winner").innerHTML = null;
+          aleatorio = numAleatorio()
+          stepX *= aleatorio;
+          stepY *= aleatorio;
         }
       }
 
       if (begin == true){
-      sphere.position.x += stepX;
-      sphere.position.y += stepY;
+        sphere.position.x += stepX;
+        sphere.position.y += stepY;
       }
 
 
@@ -86,13 +97,14 @@
         sphere.position.y = 0;
         sphere.position.x = 0;
         begin = false;
-        if (document.getElementById("cpu").innerHTML == 5){
-          document.getElementById("cpu").innerHTML = 0;
-          document.getElementById("winner").innerHTML = "the winner is CPU";
-          Letter();
+        if (document.getElementById("cpu").innerHTML == 4){
+          //document.getElementById("cpu").innerHTML = 0;
+          document.getElementById("winner").innerHTML = "CPU wins!, pulse space for new game";
+          document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
         }else{
           document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
         }
+
       }
 
 
@@ -102,6 +114,13 @@
       });
    }
 
+   function numAleatorio(){
+     var aleatorio = Math.floor(Math.random() * (2 - (-1))) + (-1);
+     if (aleatorio == 0){
+       aleatorio = 1;
+     }
+     return(aleatorio);
+   }
 
    function racketMoveLeft(position_init,racket, wall, move){
      //--Desplazamiento de la raqueta
@@ -133,8 +152,15 @@
          var collisionResults = ray.intersectObjects(borders);
          if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
             // Collision detected
+            //var  n = Math.floor(Math.random()* (10 - 1) + 1);
+            var vel_total = Math.abs(stepX) + Math.abs(stepY);
+            var  n = Math.floor(Math.random()* (7 - 3) + 3);
+            var auxx =  (vel_total*n*0.1);
+            var auxy = (vel_total*(1-n*0.1));
+
             if (collisionResults[0].object.name == "left" || collisionResults[0].object.name == "right") {
-               stepX *= -1;
+               stepX = -1*auxx*Math.sign(stepX);
+               stepY = auxy*Math.sign(stepY);
             }
             if (collisionResults[0].object.name == "down" || collisionResults[0].object.name == "top") {
                stepY *= -1;
@@ -215,15 +241,81 @@
      return material;
    }
 
-
-
 </script>
 </head>
+<style type="text/css">
+/*HOJA DE ESTILO PARA EL MARCADOR*/
+  body{background-color: black}
+
+  p { color: white;
+    font-family: Verdana;
+    letter-spacing: 3px;
+    font-size: 30px;
+  }
+  #marcador{margin: auto;
+        margin-left: auto;
+        margin-right: auto;
+        float:center;
+        border: 2px solid white;
+        width: 320px;
+        height:60px;
+        margin-bottom:3px;
+        box-shadow: 5px 5px 8px white}
+  #name1{
+    margin:auto;
+    float:left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-style: oblique;
+    padding-left: 10px;
+    padding-right: 10px;
+
+  }
+  #cpu{
+    margin:auto;
+    float:left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #name2{
+    margin:auto;
+    float:left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-style: oblique;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #player1{
+    margin:auto;
+    float:left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #winner{
+    position: absolute;
+	  top: 10px;
+	  width: 100%;
+	  text-align: center;
+	  /*z-index: 80;*/
+  	display:block;
+    font-size: 20px;
+  }
+
+</style>
 
 <body onload="init()">
-  <p id = "cpu">0</p>
-  <p id = "player1">0</p>
-  <p id = "winner"></p>
+  <div id = "marcador">
+    <p id = "name1"> CPU:  </p>
+    <p id = "cpu">0</p>
+    <p id = "name2">-  USER: </p>
+    <p id = "player1">0</p>
+    <p id = "winner"></p>
+  </div>
 </body>
 
 </html>
