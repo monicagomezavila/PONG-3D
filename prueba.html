@@ -9,8 +9,9 @@
 <script>
 
    //--Movimiento bola inicial, con aleatoriedad
-   var stepX = 0.05 * numAleatorio(2,-1);
-   var stepY = 0.15 * numAleatorio(2,-1);
+   var stepX = 0.05;
+   var stepY = 0.15;
+
 
    //--Boolean que empieza el juego si le das a la tecla de espacio
    var begin = false;
@@ -65,8 +66,25 @@
 
       checkCollision(sphere, borders);
 
+      var normal = document.getElementById("normal");
+      var easy = document.getElementById("easy");
+      var hard = document.getElementById("hard");
+      normal.onclick = () => {
+        stepX = 0.05*2*numAleatorio(2,-1);
+        stepY = 0.15*2*numAleatorio(2,-1);
+      }
+      easy.onclick = () => {
+        stepX = 0.05*numAleatorio(2,-1);
+        stepY = 0.15*numAleatorio(2,-1);
+      }
+      hard.onclick = () => {
+        stepX = 0.05*4*numAleatorio(2,-1);
+        stepY = 0.15*4*numAleatorio(2,-1);
+      }
+
       window.onkeydown = (event) => {
-      //--Para que no pueda utilizar el navegador las teclas
+      //--Para que no pueda utilizar el navegador las tecla
+
         event.preventDefault();
         if (event.key == "ArrowLeft") {
           racketMoveLeft(borders[3].position.x, borders[3], borders[0])
@@ -80,6 +98,7 @@
           //--Iniciliza cpulose cada juego (aleatorio)
           cpulose = numAleatorio(5,2);
           begin = true;
+
           //--Si en el juego anterior un jugador ya habia ganado, pone las puntuaciones a 0
           //para comezar una nueva partida
           if (document.getElementById("cpu").innerHTML == 5){
@@ -127,7 +146,7 @@
         }
       }
 
-      //--Condicion de que pierde el USER
+      //--Condicion pierde el USER
       if (sphere.position.y<borders[3].position.y){
         sphere.position.y = 0;
         sphere.position.x = 0;
@@ -138,8 +157,11 @@
         }else{
           document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
         }
+        stepX = 0.05;
+        stepY = 0.15
       }
 
+      //--Condicion pierde CPU
       if (sphere.position.y>borders[2].position.y){
         sphere.position.y = 0;
         sphere.position.x = 0;
@@ -151,6 +173,8 @@
         }else{
           document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
         }
+        stepX = 0.05;
+        stepY = 0.15
       }
 
       renderer.render(scene, camera);
@@ -168,6 +192,7 @@
      return(aleatorio);
    }
 
+   //--Funcion movimiento de raqueta a la izquierda
    function racketMoveLeft(position_init,racket, wall, move){
      //--Desplazamiento de la raqueta
      var move = 0.25;
@@ -178,6 +203,7 @@
      }
    }
 
+   //--Funcion movimiento de raqueta a la derecha
    function racketMoveRight(position_init, racket, wall){
      //--Desplazamiento de la raqueta
      var move = 0.25;
@@ -188,6 +214,7 @@
      }
    }
 
+   //--Choque con los bordes y con las palas
    function checkCollision(sphere, borders) {
 
       var originPosition = sphere.position.clone();
@@ -216,22 +243,20 @@
    }
 
 
+   //--Luz puntual
    function getLight() {
       var spotLight = new THREE.SpotLight();
-      spotLight.position.set(-10, 10, 10);
+      spotLight.position.set(-10, 5, 7);
       spotLight.angle = Math.PI / 20;
+      spotLight.penumbra = 0.3;
       spotLight.castShadow = true;
-      spotLight.shadow.camera.visible = true;
-      spotLight.shadow.camera.near = 10;
-      spotLight.shadow.camera.far = 25;
-      spotLight.shadow.camera.fov = 30;
-      spotLight.shadow.camera.aspect = 1;
       spotLight.shadow.mapSize.width = 4096;
       spotLight.shadow.mapSize.height = 4096;
       return spotLight;
    }
 
 
+   //--Crea la bola
    function getSphere() {
       var geometry = new THREE.SphereGeometry(0.7, 20, 20);
       var material = new THREE.MeshNormalMaterial();
@@ -242,6 +267,7 @@
    }
 
 
+   //--Crea el suelo
    function getFloor() {
       var geometry = new THREE.PlaneGeometry(15, 25);
       var mesh = new THREE.Mesh(geometry, getWoodMaterial());
@@ -250,6 +276,7 @@
    }
 
 
+   //--Crea los bordes
    function getBorder(name, x, y, z, posX, posY, posZ) {
       var geometry = new THREE.BoxGeometry(x, y, z);
       if (name == "top" || name == "down"){
@@ -266,6 +293,7 @@
    }
 
 
+   //--Textura madera
    function getWoodMaterial() {
       var texture = new THREE.TextureLoader().load("wood.png");
       var material = new THREE.MeshPhysicalMaterial({
@@ -277,6 +305,7 @@
       return material;
    }
 
+   //--Otra textura
    function getOtherMaterial(){
      var texture = new THREE.TextureLoader().load("skin2.jpg");
      var material = new THREE.MeshPhysicalMaterial({
@@ -292,20 +321,36 @@
 /*HOJA DE ESTILO PARA EL MARCADOR*/
   body{background-color: black}
 
-  p { color: white;
+  p { color: #C6D4E0;
     font-family: Verdana;
     letter-spacing: 3px;
     font-size: 30px;
+  }
+  button {
+    background-color: #C6D4E0;
+    border-radius: 10px;
+    color: black;
+    text-align: center;
+    padding: 10px 10px;
+    font-size: 15px;
+    margin: 5px 5px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+  }
+  button:hover {
+    background-color:black;
+    color: white;
   }
   #marcador{margin: auto;
         margin-left: auto;
         margin-right: auto;
         float:center;
-        border: 2px solid white;
+        border: 2px solid #C6D4E0;
         width: 320px;
         height:60px;
         margin-bottom:3px;
-        box-shadow: 5px 5px 8px white}
+        box-shadow: 5px 5px 8px #C6D4E0}
   #name1{
     margin:auto;
     float:left;
@@ -349,6 +394,13 @@
   	display:block;
     font-size: 20px;
   }
+  #level{
+    margin:auto;
+    float:center;
+    width: 260px;
+    height:60px;
+    padding-top: 10px;
+  }
 
 </style>
 
@@ -359,6 +411,11 @@
     <p id = "name2">-  USER: </p>
     <p id = "player1">0</p>
     <p id = "winner"></p>
+  </div>
+  <div id = "level">
+    <button id = "easy"> EASY</button>
+    <button id = "normal"> NORMAL</button>
+    <button id = "hard"> HARD</button>
   </div>
 </body>
 
