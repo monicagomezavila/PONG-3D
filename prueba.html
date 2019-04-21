@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 <title>Three.js: PONG-3D</title>
-
+<link rel="stylesheet" href="pong.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/103/three.min.js"></script>
 
 <script>
@@ -104,6 +103,7 @@
           if (document.getElementById("cpu").innerHTML == 5){
             document.getElementById("cpu").innerHTML = 0;
             document.getElementById("player1").innerHTML = 0;
+            document.getElementById("winner").innerHTML = null;
             //--Elimina el letrero del ganador
             document.getElementById("winner").innerHTML = null;
           }else if (document.getElementById("player1").innerHTML == 5) {
@@ -167,7 +167,7 @@
         sphere.position.x = 0;
         begin = false;
 
-        if (document.getElementById("cpu").innerHTML == 4){
+        if (document.getElementById("player1").innerHTML == 4){
           document.getElementById("winner").innerHTML = "USER wins!, pulse space for new game";
           document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
         }else{
@@ -317,91 +317,6 @@
 
 </script>
 </head>
-<style type="text/css">
-/*HOJA DE ESTILO PARA EL MARCADOR*/
-  body{background-color: black}
-
-  p { color: #C6D4E0;
-    font-family: Verdana;
-    letter-spacing: 3px;
-    font-size: 30px;
-  }
-  button {
-    background-color: #C6D4E0;
-    border-radius: 10px;
-    color: black;
-    text-align: center;
-    padding: 10px 10px;
-    font-size: 15px;
-    margin: 5px 5px;
-    cursor: pointer;
-    -webkit-transition-duration: 0.4s;
-    transition-duration: 0.4s;
-  }
-  button:hover {
-    background-color:black;
-    color: white;
-  }
-  #marcador{margin: auto;
-        margin-left: auto;
-        margin-right: auto;
-        float:center;
-        border: 2px solid #C6D4E0;
-        width: 320px;
-        height:60px;
-        margin-bottom:3px;
-        box-shadow: 5px 5px 8px #C6D4E0}
-  #name1{
-    margin:auto;
-    float:left;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    font-style: oblique;
-    padding-left: 10px;
-    padding-right: 10px;
-
-  }
-  #cpu{
-    margin:auto;
-    float:left;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  #name2{
-    margin:auto;
-    float:left;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    font-style: oblique;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  #player1{
-    margin:auto;
-    float:left;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  #winner{
-    position: absolute;
-	  top: 10px;
-	  width: 100%;
-	  text-align: center;
-  	display:block;
-    font-size: 20px;
-  }
-  #level{
-    margin:auto;
-    float:center;
-    width: 260px;
-    height:60px;
-    padding-top: 10px;
-  }
-
 </style>
 
 <body onload="init()">
