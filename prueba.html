@@ -8,40 +8,44 @@
 
 <script>
 
-   //--Movimiento bola
-   aleatorio = numAleatorio(2,-1)
-   var stepX = 0.05 * aleatorio;
-   var stepY = 0.15 * aleatorio;
+   //--Movimiento bola inicial, con aleatoriedad
+   var stepX = 0.05 * numAleatorio(2,-1);
+   var stepY = 0.15 * numAleatorio(2,-1);
 
    //--Boolean que empieza el juego si le das a la tecla de espacio
    var begin = false;
-   //--Choques antes de que la cpu pierda
-   var cpulose = numAleatorio(10,2);
-
+   //--Choques con las raquetas antes de que la cpu pierda
+   var cpulose;
 
 
    function init() {
       var scene = new THREE.Scene();
       var sceneWidth = window.innerWidth;
       var sceneHeight = window.innerHeight;
+
       var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
       camera.position.set(0, 0, 15);
       camera.lookAt(scene.position);
+
       var renderer = new THREE.WebGLRenderer({
          antialias : true
       });
-
       renderer.shadowMap.enabled = true;
       renderer.setSize(sceneWidth, sceneHeight);
       document.body.appendChild(renderer.domElement);
+
       //Añade luz ambiental para poder ver lo que no alumbra la luz puntual
       var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
       scene.add(ambientLight);
+      //Luz puntual
       var light = getLight();
+
+      //--Bordes laterales y raquetas
       var leftBorder = getBorder("left", 1, 25, 1, -7.5, 0, 0);
       var rightBorder = getBorder("right", 1, 25, 1, 7.5, 0, 0);
       var CPU = getBorder("top", 3, 1, 1, 0, 13, 0);
       var USER = getBorder("down", 3, 1, 1, 0, -13, 0);
+
       var sphere = getSphere();
       var floor = getFloor();
       scene.add(light);
@@ -62,7 +66,7 @@
       checkCollision(sphere, borders);
 
       window.onkeydown = (event) => {
-      //--Para usar sólo tú la tecla y que no la pueda utilizar el navegador
+      //--Para que no pueda utilizar el navegador las teclas
         event.preventDefault();
         if (event.key == "ArrowLeft") {
           racketMoveLeft(borders[3].position.x, borders[3], borders[0])
@@ -71,49 +75,83 @@
           racketMoveRight(borders[3].position.x, borders[3], borders[1])
         }
 
+        //--Comenzará a moverse la bola cuando se pulse la tecla espacio
         if (event.key == " "){
-          //--Comenzará a moverse la bola
+          //--Iniciliza cpulose cada juego (aleatorio)
+          cpulose = numAleatorio(5,2);
           begin = true;
-          if (document.getElementById("cpu").innerHTML == 2){
+          //--Si en el juego anterior un jugador ya habia ganado, pone las puntuaciones a 0
+          //para comezar una nueva partida
+          if (document.getElementById("cpu").innerHTML == 5){
             document.getElementById("cpu").innerHTML = 0;
+            document.getElementById("player1").innerHTML = 0;
+            //--Elimina el letrero del ganador
+            document.getElementById("winner").innerHTML = null;
           }else if (document.getElementById("player1").innerHTML == 5) {
+            document.getElementById("player1").innerHTML = 0;
             document.getElementById("cpu").innerHTML = 0;
+            //--Elimina el letrero del ganador
+            document.getElementById("winner").innerHTML = null;
           }
-          document.getElementById("winner").innerHTML = null;
-          aleatorio = numAleatorio(2,-1)
-          stepX *= aleatorio;
-          stepY *= aleatorio;
+          //--La bola se inicializa de manera aleatoria hacia cpu o hacia user
+          stepX *= numAleatorio(2,-1);
+          stepY *= numAleatorio(2,-1);
         }
       }
 
       if (begin == true){
+        //--La bola se mueve si el juego esta inicializado
         sphere.position.x += stepX;
         sphere.position.y += stepY;
       }
 
-
+      //--Movimiento de la CPU
       if (sphere.position.x >= borders[2].position.x){
-        racketMoveRight(sphere.position.x,borders[2],borders[1]);
+        if (cpulose < 1){
+          //--Hace que la raqueta se mueva al lado contrario
+          //permite ganar a user
+          racketMoveLeft(borders[2].position.x, borders[2], borders[0])
+        }else{
+          racketMoveRight(sphere.position.x,borders[2],borders[1]);
+        }
       }
 
+      //--Movimiento de la CPU
       if (sphere.position.x < borders[2].position.x){
-        racketMoveLeft(sphere.position.x,borders[2], borders[0])
+        if (cpulose < 1){
+          //--Hace que la raqueta se mueva al lado contrario
+          //permite ganar a user
+          racketMoveRight(borders[2].position.x,borders[2], borders[1])
+        }else{
+          racketMoveLeft(sphere.position.x,borders[2], borders[0])
+        }
       }
 
-      if (sphere.position.y<borders[2].position.y*(-1)){
+      //--Condicion de que pierde el USER
+      if (sphere.position.y<borders[3].position.y){
         sphere.position.y = 0;
         sphere.position.x = 0;
         begin = false;
-        if (document.getElementById("cpu").innerHTML == 1){
-          //document.getElementById("cpu").innerHTML = 0;
+        if (document.getElementById("cpu").innerHTML == 4){
           document.getElementById("winner").innerHTML = "CPU wins!, pulse space for new game";
           document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
         }else{
           document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
         }
-
       }
 
+      if (sphere.position.y>borders[2].position.y){
+        sphere.position.y = 0;
+        sphere.position.x = 0;
+        begin = false;
+
+        if (document.getElementById("cpu").innerHTML == 4){
+          document.getElementById("winner").innerHTML = "USER wins!, pulse space for new game";
+          document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
+        }else{
+          document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
+        }
+      }
 
       renderer.render(scene, camera);
       requestAnimationFrame(function() {
@@ -151,6 +189,7 @@
    }
 
    function checkCollision(sphere, borders) {
+
       var originPosition = sphere.position.clone();
       for (var i = 0; i < sphere.geometry.vertices.length; i++) {
          var localVertex = sphere.geometry.vertices[i].clone();
@@ -169,6 +208,7 @@
             }
             if (collisionResults[0].object.name == "down" || collisionResults[0].object.name == "top") {
                stepY *= -1;
+               cpulose -= 1;
             }
             break;
          }
