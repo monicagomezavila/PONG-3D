@@ -307,10 +307,11 @@
 
    //--Otra textura
    function getOtherMaterial(){
-     var texture = new THREE.TextureLoader().load("skin2.jpg");
+     var texture = new THREE.TextureLoader().load("skinpiedra.jpg");
      var material = new THREE.MeshPhysicalMaterial({
         map : texture
      });
+     material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
      material.side = THREE.DoubleSide;
      return material;
    }
