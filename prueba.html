@@ -12,8 +12,12 @@
    aleatorio = numAleatorio(2,-1)
    var stepX = 0.05 * aleatorio;
    var stepY = 0.15 * aleatorio;
+
    //--Boolean que empieza el juego si le das a la tecla de espacio
    var begin = false;
+   //--Choques antes de que la cpu pierda
+   var cpulose = numAleatorio(10,2);
+
 
 
    function init() {
@@ -155,16 +159,13 @@
          var ray = new THREE.Raycaster(originPosition, directionVector.clone().normalize());
          var collisionResults = ray.intersectObjects(borders);
          if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-            // Collision detected
-            //var  n = Math.floor(Math.random()* (10 - 1) + 1);
-            var vel_total = Math.abs(stepX) + Math.abs(stepY);
-            var  n = Math.floor(Math.random()* (7 - 3) + 3);
-            var auxx =  (vel_total*n*0.1);
-            var auxy = (vel_total*(1-n*0.1));
 
             if (collisionResults[0].object.name == "left" || collisionResults[0].object.name == "right") {
-               stepX = -1*auxx*Math.sign(stepX);
-               stepY = auxy*Math.sign(stepY);
+              //--Colisión con los bordes aleatoria
+              var vel_total = Math.abs(stepX) + Math.abs(stepY);
+              var  n = numAleatorio(7,3)
+               stepX = -1*(vel_total*n*0.1)*Math.sign(stepX);
+               stepY = (vel_total*(1-n*0.1))*Math.sign(stepY);
             }
             if (collisionResults[0].object.name == "down" || collisionResults[0].object.name == "top") {
                stepY *= -1;
