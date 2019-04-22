@@ -41,10 +41,10 @@
       var light = getLight();
 
       //--Bordes laterales y raquetas
-      var leftBorder = getBorder("left", 1, 25, 1, -7.5, 0, 0);
-      var rightBorder = getBorder("right", 1, 25, 1, 7.5, 0, 0);
-      var CPU = getBorder("top", 3, 1, 1, 0, 13, 0);
-      var USER = getBorder("down", 3, 1, 1, 0, -13, 0);
+      var leftBorder = getBorder("left", 1, 20, 1, -7.5, 0, 0);
+      var rightBorder = getBorder("right", 1, 20, 1, 7.5, 0, 0);
+      var CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
+      var USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
 
       var sphere = getSphere();
       var floor = getFloor();
@@ -64,6 +64,7 @@
    function animate(sphere, borders, renderer, scene, camera) {
 
       checkCollision(sphere, borders);
+      sphere.rotation.y += 0.02;
 
       var normal = document.getElementById("normal");
       var easy = document.getElementById("easy");
@@ -259,8 +260,9 @@
    //--Crea la bola
    function getSphere() {
       var geometry = new THREE.SphereGeometry(0.7, 20, 20);
-      var material = new THREE.MeshNormalMaterial();
-      var mesh = new THREE.Mesh(geometry, material);
+      //var material = new THREE.MeshNormalMaterial();
+      //var mesh = new THREE.Mesh(geometry, material);
+      var mesh = new THREE.Mesh(geometry, getSphereMaterial());
       mesh.castShadow = true;
       mesh.name = "sphere";
       return mesh;
@@ -269,7 +271,7 @@
 
    //--Crea el suelo
    function getFloor() {
-      var geometry = new THREE.PlaneGeometry(15, 25);
+      var geometry = new THREE.PlaneGeometry(15, 20);
       var mesh = new THREE.Mesh(geometry, getWoodMaterial());
       mesh.receiveShadow = true;
       return mesh;
@@ -313,6 +315,16 @@
      });
      material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
      material.side = THREE.DoubleSide;
+     return material;
+   }
+
+   function getSphereMaterial(){
+     var texture = new THREE.TextureLoader().load("skincara.jpeg");
+     var material = new THREE.MeshPhysicalMaterial({
+        map : texture
+     });
+     //material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
+     //material.side = THREE.DoubleSide;
      return material;
    }
 
