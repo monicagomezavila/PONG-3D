@@ -15,6 +15,9 @@
    // pasa a false cuando un CPU o USER ganan un juego
    var begin = false;
 
+   //--Variable skin, cambia la Textura
+   var skin;
+
    //--Choques con las raquetas antes de que la CPU pierda, aleatorio
    var cpulose;
 
@@ -23,6 +26,7 @@
       var sceneWidth = window.innerWidth;
       var sceneHeight = window.innerHeight;
 
+      skin = "skin3.jpg";
       //--Camara
       var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
       camera.position.set(0, 0, 15);
@@ -70,6 +74,20 @@
 
       //--Movimiento de la bola sobre su eje
       sphere.rotation.y += 0.05;
+
+      var button_skin = document.getElementById("skin");
+
+      button_skin.onclick = () => {
+        console.log("HOLA")
+        console.log(skin)
+        if (skin == ("skin3.jpg")){
+          skin = "skin2.jpg"
+        }else{
+          skin ="skin3.jpg"
+        }
+        CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
+        USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
+      }
 
       //--Niveles de dificultad, se eligen cada vez que se empieza una partida
       var normal = document.getElementById("normal");
@@ -321,7 +339,7 @@
 
    //--Otra textura
    function getOtherMaterial(){
-     var texture = new THREE.TextureLoader().load("skin3.jpg");
+     var texture = new THREE.TextureLoader().load(skin);
      var material = new THREE.MeshPhysicalMaterial({
         map : texture
      });
