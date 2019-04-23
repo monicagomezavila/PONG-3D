@@ -17,12 +17,15 @@
 
    //--Variable skin, cambia la Textura
    var skin;
+   var CPU;
+   var USER;
+   var scene;
 
    //--Choques con las raquetas antes de que la CPU pierda, aleatorio
    var cpulose;
 
    function init() {
-      var scene = new THREE.Scene();
+      scene = new THREE.Scene();
       var sceneWidth = window.innerWidth;
       var sceneHeight = window.innerHeight;
 
@@ -48,8 +51,8 @@
       //--Bordes laterales y raquetas
       var leftBorder = getBorder("left", 1, 20, 1, -7.5, 0, 0);
       var rightBorder = getBorder("right", 1, 20, 1, 7.5, 0, 0);
-      var CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
-      var USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
+      CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
+      USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
 
       var sphere = getSphere();
       //Luz puntual
@@ -87,6 +90,11 @@
         }
         CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
         USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
+
+        var cpu = scene.getObjectByName("top");
+        cpu.material = getWoodMaterial();
+        console.log(cpu);
+
       }
 
       //--Niveles de dificultad, se eligen cada vez que se empieza una partida
