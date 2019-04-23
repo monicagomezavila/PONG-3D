@@ -7,16 +7,16 @@
 
 <script>
 
-   //--Movimiento bola inicial, con aleatoriedad
-   var stepX = 0.05;
-   var stepY = 0.15;
+   //--Movimiento bola inicial, definido por si no se elige dificultad y aleatoriedad
+   var stepX = 0.05 * numAleatorio(2,-1);
+   var stepY = 0.15* numAleatorio(2,-1);
 
-
-   //--Boolean que empieza el juego si le das a la tecla de espacio
+   //--Boolean que empieza el juego si le das a la tecla de espacio (true)
+   // pasa a false cuando un CPU o USER ganan un juego
    var begin = false;
-   //--Choques con las raquetas antes de que la cpu pierda
-   var cpulose;
 
+   //--Choques con las raquetas antes de que la CPU pierda, aleatorio
+   var cpulose;
 
    function init() {
       var scene = new THREE.Scene();
@@ -37,6 +37,7 @@
       //Añade luz ambiental para poder ver lo que no alumbra la luz puntual
       var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
       scene.add(ambientLight);
+
       //Luz puntual
       var light = getLight();
 
@@ -64,11 +65,16 @@
    function animate(sphere, borders, renderer, scene, camera) {
 
       checkCollision(sphere, borders);
-      sphere.rotation.y += 0.02;
+      //--Movimiento de la bola sobre su eje
+      sphere.rotation.y += 0.05;
 
+      //--Niveles de dificultad, se eligen cada vez que se empieza una partida
       var normal = document.getElementById("normal");
       var easy = document.getElementById("easy");
       var hard = document.getElementById("hard");
+
+      //--La velocidad easy esta por defecto, se añade para aleatoriedad de salida
+      //hacia CPU o USER
       normal.onclick = () => {
         stepX = 0.05*2*numAleatorio(2,-1);
         stepY = 0.15*2*numAleatorio(2,-1);
@@ -82,9 +88,9 @@
         stepY = 0.15*4*numAleatorio(2,-1);
       }
 
+      //--Toma eventos del teclado
       window.onkeydown = (event) => {
       //--Para que no pueda utilizar el navegador las tecla
-
         event.preventDefault();
         if (event.key == "ArrowLeft") {
           racketMoveLeft(borders[3].position.x, borders[3], borders[0])
@@ -92,35 +98,21 @@
         if (event.key == "ArrowRight") {
           racketMoveRight(borders[3].position.x, borders[3], borders[1])
         }
-
         //--Comenzará a moverse la bola cuando se pulse la tecla espacio
         if (event.key == " "){
           //--Iniciliza cpulose cada juego (aleatorio)
           cpulose = numAleatorio(5,2);
           begin = true;
 
-          //--Si en el juego anterior un jugador ya habia ganado, pone las puntuaciones a 0
-          //para comezar una nueva partida
-          if (document.getElementById("cpu").innerHTML == 5){
-            document.getElementById("cpu").innerHTML = 0;
-            document.getElementById("player1").innerHTML = 0;
-            document.getElementById("winner").innerHTML = null;
-            //--Elimina el letrero del ganador
-            document.getElementById("winner").innerHTML = null;
-          }else if (document.getElementById("player1").innerHTML == 5) {
-            document.getElementById("player1").innerHTML = 0;
-            document.getElementById("cpu").innerHTML = 0;
-            //--Elimina el letrero del ganador
-            document.getElementById("winner").innerHTML = null;
-          }
-          //--La bola se inicializa de manera aleatoria hacia cpu o hacia user
-          stepX *= numAleatorio(2,-1);
-          stepY *= numAleatorio(2,-1);
+          //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
+          //pone las puntuaciones a 0 para comezar una nueva partida
+          newGame("cpu", "player1");
+          newGame("player1", "cpu");
         }
       }
 
+      //--La bola se mueve si el juego esta inicializado
       if (begin == true){
-        //--La bola se mueve si el juego esta inicializado
         sphere.position.x += stepX;
         sphere.position.y += stepY;
       }
@@ -132,6 +124,7 @@
           //permite ganar a user
           racketMoveLeft(borders[2].position.x, borders[2], borders[0])
         }else{
+          //--Movimiento de la raqueta siguiendo la bola
           racketMoveRight(sphere.position.x,borders[2],borders[1]);
         }
       }
@@ -143,39 +136,19 @@
           //permite ganar a user
           racketMoveRight(borders[2].position.x,borders[2], borders[1])
         }else{
+          //--Movimiento de la raqueta siguiendo la bola
           racketMoveLeft(sphere.position.x,borders[2], borders[0])
         }
       }
 
       //--Condicion pierde el USER
       if (sphere.position.y<borders[3].position.y){
-        sphere.position.y = 0;
-        sphere.position.x = 0;
-        begin = false;
-        if (document.getElementById("cpu").innerHTML == 4){
-          document.getElementById("winner").innerHTML = "CPU wins!, pulse space for new game";
-          document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
-        }else{
-          document.getElementById("cpu").innerHTML = 1+parseInt(document.getElementById("cpu").innerHTML);
-        }
-        stepX = 0.05;
-        stepY = 0.15
+        winner(sphere,"cpu");
       }
 
       //--Condicion pierde CPU
       if (sphere.position.y>borders[2].position.y){
-        sphere.position.y = 0;
-        sphere.position.x = 0;
-        begin = false;
-
-        if (document.getElementById("player1").innerHTML == 4){
-          document.getElementById("winner").innerHTML = "USER wins!, pulse space for new game";
-          document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
-        }else{
-          document.getElementById("player1").innerHTML = 1+parseInt(document.getElementById("player1").innerHTML);
-        }
-        stepX = 0.05;
-        stepY = 0.15
+        winner(sphere, "player1")
       }
 
       renderer.render(scene, camera);
@@ -191,6 +164,35 @@
        aleatorio = 1;
      }
      return(aleatorio);
+   }
+
+   //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
+   //pone las puntuaciones a 0 para comezar una nueva partida
+   function newGame(id, id2){
+
+     if (document.getElementById(id).innerHTML == 5){
+       document.getElementById(id).innerHTML = 0;
+       document.getElementById(id2).innerHTML = 0;
+       document.getElementById("winner").innerHTML = null;
+       //--Elimina el letrero del ganador
+       document.getElementById("winner").innerHTML = null;
+     }
+   }
+
+   //--Se le pasa la bola y el nombre del ganador
+   //--Comprueba si ha gnado un juego o ha ganado la partida
+   function winner(sphere, id){
+     sphere.position.y = 0;
+     sphere.position.x = 0;
+     begin = false;
+     if (document.getElementById(id).innerHTML == 4){
+       document.getElementById("winner").innerHTML = id + "wins!, pulse space for new game";
+       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
+     }else{
+       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
+     }
+     stepX = 0.05;
+     stepY = 0.15;
    }
 
    //--Funcion movimiento de raqueta a la izquierda
@@ -317,6 +319,7 @@
      return material;
    }
 
+   //--Textura de la bola
    function getSphereMaterial(){
      var texture = new THREE.TextureLoader().load("face.jpg");
      var material = new THREE.MeshPhysicalMaterial({
