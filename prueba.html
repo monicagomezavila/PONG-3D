@@ -23,6 +23,7 @@
       var sceneWidth = window.innerWidth;
       var sceneHeight = window.innerHeight;
 
+      //--Camara
       var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
       camera.position.set(0, 0, 15);
       camera.lookAt(scene.position);
@@ -38,8 +39,7 @@
       var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
       scene.add(ambientLight);
 
-      //Luz puntual
-      var light = getLight();
+
 
       //--Bordes laterales y raquetas
       var leftBorder = getBorder("left", 1, 20, 1, -7.5, 0, 0);
@@ -48,6 +48,9 @@
       var USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
 
       var sphere = getSphere();
+      //Luz puntual
+      var light = getLight(sphere);
+
       var floor = getFloor();
       scene.add(light);
       scene.add(leftBorder);
@@ -61,27 +64,21 @@
    }
 
 
-
    function animate(sphere, borders, renderer, scene, camera) {
 
       checkCollision(sphere, borders);
+
       //--Movimiento de la bola sobre su eje
       sphere.rotation.y += 0.05;
 
       //--Niveles de dificultad, se eligen cada vez que se empieza una partida
       var normal = document.getElementById("normal");
-      var easy = document.getElementById("easy");
       var hard = document.getElementById("hard");
 
-      //--La velocidad easy esta por defecto, se añade para aleatoriedad de salida
-      //hacia CPU o USER
+      //--La velocidad easy no está definida porque esta por defecto
       normal.onclick = () => {
         stepX = 0.05*2*numAleatorio(2,-1);
         stepY = 0.15*2*numAleatorio(2,-1);
-      }
-      easy.onclick = () => {
-        stepX = 0.05*numAleatorio(2,-1);
-        stepY = 0.15*numAleatorio(2,-1);
       }
       hard.onclick = () => {
         stepX = 0.05*4*numAleatorio(2,-1);
@@ -104,7 +101,7 @@
           cpulose = numAleatorio(5,2);
           begin = true;
 
-          //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
+          //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
           //pone las puntuaciones a 0 para comezar una nueva partida
           newGame("cpu", "player1");
           newGame("player1", "cpu");
@@ -157,6 +154,8 @@
       });
    }
 
+
+
    //--Función que devuleve un número aleatorio entre el minimo incluido y el maximo sin incluir
    function numAleatorio(max, min){
      var aleatorio = Math.floor(Math.random() * (max-min)+min);
@@ -165,6 +164,8 @@
      }
      return(aleatorio);
    }
+
+
 
    //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
    //pone las puntuaciones a 0 para comezar una nueva partida
@@ -178,6 +179,8 @@
        document.getElementById("winner").innerHTML = null;
      }
    }
+
+
 
    //--Se le pasa la bola y el nombre del ganador
    //--Comprueba si ha gnado un juego o ha ganado la partida
@@ -195,6 +198,8 @@
      stepY = 0.15;
    }
 
+
+
    //--Funcion movimiento de raqueta a la izquierda
    function racketMoveLeft(position_init,racket, wall, move){
      //--Desplazamiento de la raqueta
@@ -206,6 +211,8 @@
      }
    }
 
+
+
    //--Funcion movimiento de raqueta a la derecha
    function racketMoveRight(position_init, racket, wall){
      //--Desplazamiento de la raqueta
@@ -216,6 +223,8 @@
        racket.position.x += move;
      }
    }
+
+
 
    //--Choque con los bordes y con las palas
    function checkCollision(sphere, borders) {
@@ -248,8 +257,10 @@
 
 
    //--Luz puntual
-   function getLight() {
+   function getLight(sphere) {
       var spotLight = new THREE.SpotLight();
+      //--La luz sigue a la bola
+      spotLight.target = sphere;
       spotLight.position.set(-10, 5, 7);
       spotLight.angle = Math.PI / 20;
       spotLight.penumbra = 0.3;
@@ -328,6 +339,7 @@
      return material;
    }
 
+
 </script>
 </head>
 </style>
@@ -344,6 +356,7 @@
     <button id = "easy"> EASY</button>
     <button id = "normal"> NORMAL</button>
     <button id = "hard"> HARD</button>
+    <button id = "skin">Change skin</button>
   </div>
 </body>
 
