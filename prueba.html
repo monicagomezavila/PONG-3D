@@ -22,6 +22,9 @@
    //--Variable aleatoria, numero de choques con las raquetas antes de que la CPU deje de seguir la bola
    var cpulose;
 
+   //--Posicion anterior bola
+   var auxilio;
+
 
 
    function init() {
@@ -98,7 +101,7 @@
       var normal = document.getElementById("normal");
       var hard = document.getElementById("hard");
 
-      //--La velocidad easy no está definida porque esta por defecto
+      //--VELOCIDADES
       normal.onclick = () => {
         stepX = 0.05*2*numAleatorio(2,-1);
         stepY = 0.15*2*numAleatorio(2,-1);
@@ -106,6 +109,10 @@
       hard.onclick = () => {
         stepX = 0.05*4*numAleatorio(2,-1);
         stepY = 0.15*4*numAleatorio(2,-1);
+      }
+      easy.onclick = () => {
+        stepX = 0.05*numAleatorio(2,-1);
+        stepY = 0.15*numAleatorio(2,-1);
       }
 
       //--Toma eventos del teclado
@@ -132,6 +139,7 @@
 
       //--La bola se mueve si el juego esta inicializado
       if (begin == true){
+        auxilio = sphere.position.x;
         sphere.position.x += stepX;
         sphere.position.y += stepY;
       }
@@ -300,7 +308,11 @@
          //x tiene que ser mayor pero se mantiene l avelocidad
           console.log("choque izquierdo")
           var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepX = (vel_total*0.6) * Math.sign(stepX)
+          if (auxilio>=positionX_sphere){
+            stepX = (vel_total*0.6) * Math.sign(stepX)
+          }else{
+            stepX = (vel_total*0.6) * Math.sign(stepX)*-1
+          }
           stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
        }
      }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
@@ -308,8 +320,13 @@
          //x tiene que ser mayor pero se mantiene l avelocidad
           console.log("choque lateral derecho")
           var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepX = (vel_total*0.6) * Math.sign(stepX)
           stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+          if (auxilio>=positionX_sphere){
+            stepX = (vel_total*0.6) * Math.sign(stepX)*-1
+          }else{
+            stepX = (vel_total*0.6) * Math.sign(stepX)
+          }
+
        }
      }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
