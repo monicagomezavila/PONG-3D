@@ -76,7 +76,7 @@
      sphere.rotation.y += 0.05;
 
      //--Choque con los bordes o con las raquetas
-      checkCollision(sphere, borders);
+     checkCollision(sphere,borders)
 
       //--Boton para cambiar la textura de las raquetas
       var button_skin = document.getElementById("skin");
@@ -248,33 +248,60 @@
 
 
 
-   //--Choque con los bordes y con las palas
-   function checkCollision(sphere, borders) {
+   function checkCollision(sphere,borders){
+     //--PARAMETROS ESFERA
+     positionX_sphere = sphere.position.x;
+     positionY_sphere = sphere.position.y;
+     radius_sphere = sphere.geometry.parameters.radius;
 
-     //--Posición x y z de la bola
-      var originPosition = sphere.position.clone();
-      for (var i = 0; i < sphere.geometry.vertices.length; i++) {
-         var localVertex = sphere.geometry.vertices[i].clone();
-         var globalVertex = localVertex.applyMatrix4(sphere.matrix);
-         var directionVector = globalVertex.sub(sphere.position);
-         var ray = new THREE.Raycaster(originPosition, directionVector.clone().normalize());
-         var collisionResults = ray.intersectObjects(borders);
-         if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
+     //--PARAMETROS BORDE IZQUIERDO
+     positionX_left = borders[0].position.x;
+     positionY_left = borders[0].position.y;
+     height_left = borders[0].geometry.parameters.height;
+     width_left = borders[0].geometry.parameters.width;
 
-            if (collisionResults[0].object.name == "left" || collisionResults[0].object.name == "right") {
-              //--Colisión con los bordes aleatoria
-              var vel_total = Math.abs(stepX) + Math.abs(stepY);
-              var  n = numAleatorio(7,3)
-               stepX = -1*(vel_total*n*0.1)*Math.sign(stepX);
-               stepY = (vel_total*(1-n*0.1))*Math.sign(stepY);
-            }
-            if (collisionResults[0].object.name == "down" || collisionResults[0].object.name == "top") {
-               stepY *= -1;
-               cpulose -= 1;
-            }
-            break;
-         }
-      }
+
+     //--PARAMETROS DERECHO
+     positionX_right = borders[1].position.x;
+     positionY_right = borders[1].position.y;
+     height_right = borders[1].geometry.parameters.height;
+     width_right = borders[1].geometry.parameters.width;
+
+     //--PARAMETROS top
+     positionX_top = borders[2].position.x;
+     positionY_top = borders[2].position.y;
+     width_top = borders[2].geometry.parameters.width;
+     height_top = borders[2].geometry.parameters.height;
+
+     //--PARAMETROS down
+     positionX_down = borders[3].position.x;
+     width_down = borders[3].geometry.parameters.width;
+     height_down = borders[3].geometry.parameters.height;
+     positionY_down = borders[3].position.y;
+
+     //--CONDICION CHOQUE LEFT
+     if ((positionX_sphere-(radius_sphere/2)) <= (positionX_left+(width_left/2))){
+       stepX *= -1;
+    //--CONDICION CHOQUE CON EL right
+     }else if ((positionX_sphere+(radius_sphere/2))>=(positionX_right-(width_right/2))){
+       stepX *= -1;
+     }
+
+     //--CONDICION CHOQUE top
+     if (((positionX_top-(width_top/2))<=positionX_sphere) && (positionX_sphere<=((positionX_top+(width_top/2))))){
+       if ((positionY_sphere+(radius_sphere/2))>= (positionY_top-(height_top/2))){
+         stepY *= -1
+       }
+     }
+
+     //--CONDICION CHOQUE down
+     if (((positionX_down-(width_down/2))<=positionX_sphere) && (positionX_sphere<=((positionX_down+(width_down/2))))){
+       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+          stepY *= -1
+       }
+     }
+
+
    }
 
 
@@ -295,10 +322,9 @@
 
    //--Crea la bola
    function getSphere() {
-      var geometry = new THREE.SphereGeometry(0.7, 20, 20);
+      var geometry = new THREE.SphereGeometry(0.8, 20, 20);
       var mesh = new THREE.Mesh(geometry, getSphereMaterial());
       mesh.castShadow = true;
-      mesh.name = "sphere";
       return mesh;
    }
 
