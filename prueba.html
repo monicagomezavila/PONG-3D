@@ -294,13 +294,32 @@
        }
      }
 
-     //--CONDICION CHOQUE down
-     if (((positionX_down-(width_down/2))<=positionX_sphere) && (positionX_sphere<=((positionX_down+(width_down/2))))){
+     //--CONDICNION CHOQUEN EXTREMOS raqueta bottom dependiendo posicion
+     if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-          stepY *= -1
+         //x tiene que ser mayor pero se mantiene l avelocidad
+          console.log("choque izquierdo")
+          var vel_total = Math.abs(stepX) + Math.abs(stepY)
+          stepX = (vel_total*0.6) * Math.sign(stepX)
+          stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+       }
+     }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
+       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+         //x tiene que ser mayor pero se mantiene l avelocidad
+          console.log("choque lateral derecho")
+          var vel_total = Math.abs(stepX) + Math.abs(stepY)
+          stepX = (vel_total*0.6) * Math.sign(stepX)
+          stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+       }
+     }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
+       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+         //x tiene que ser menor pero mantiene velocidad
+         console.log("choque en el centro")
+         var vel_total = Math.abs(stepX) + Math.abs(stepY)
+         stepX = (vel_total*0.4) * Math.sign(stepX)
+         stepY = -1 * 0.6 * vel_total * Math.sign(stepY)
        }
      }
-
 
    }
 
