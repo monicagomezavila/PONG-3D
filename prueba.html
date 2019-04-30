@@ -7,157 +7,158 @@
 
 <script>
 
-   //--Movimiento bola inicial, definido por si no se elige dificultad
-   //aleatoriedad hacia CPU o USER e izq o drch
-   var stepX = 0.05 * numAleatorio(2,-1);
-   var stepY = 0.15* numAleatorio(2,-1);
+  //--Movimiento bola inicial, definido por si no se elige dificultad
+  //--Aleatoriedad hacia CPU o USER e izq o drch
+  var stepX = 0.05 * numAleatorio(2,-1);
+  var stepY = 0.15* numAleatorio(2,-1);
 
-   //--Boolean = true si le das a la tecla de espacio, empieza el juego
-   // pasa a false cuando un CPU o USER ganan un juego
-   var begin = false;
+  //--Boolean = true si le das a la tecla de espacio, empieza el juego
+  //--Pasa a false cuando un CPU o USER ganan un juego
+  var begin = false;
 
-   //--Variable skin, para cambiar la textura de las raquetas
-   var skin = "skin3.jpg";
+  //--Variable skin, para cambiar la textura de las raquetas
+  var skin = "skin3.jpg";
 
-   //--Variable aleatoria, numero de choques con las raquetas antes de que la CPU deje de seguir la bola
-   var cpulose;
+  //--Variable aleatoria, número de choques con las raquetas antes de que la CPU deje de seguir la bola
+  var cpulose;
 
-   //--Posicion anterior bola
-   var previous_position_sphere;
+  //--Posición anterior bola (AVANZADO)
+  var previous_position_sphere;
 
-   //--Posicion anterior USER
-   var previous_position_user;
-
-
-
-   function init() {
-
-      var scene = new THREE.Scene();
-      var sceneWidth = window.innerWidth;
-      var sceneHeight = window.innerHeight;
-
-      var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
-      camera.position.set(0, 0, 15);
-      camera.lookAt(scene.position);
-
-      var renderer = new THREE.WebGLRenderer({
-         antialias : true
-      });
-      renderer.shadowMap.enabled = true;
-      renderer.setSize(sceneWidth, sceneHeight);
-      document.body.appendChild(renderer.domElement);
-
-      //--Bordes laterales y raquetas
-      var leftBorder = getBorder("left", 1, 20, 1, -7.5, 0, 0);
-      var rightBorder = getBorder("right", 1, 20, 1, 7.5, 0, 0);
-      var CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
-      var USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
-      var borders = [ leftBorder, rightBorder, CPU, USER ];
-
-      //--Bola y suelo
-      var sphere = getSphere();
-      var floor = getFloor();
-
-      //Luz puntual
-      var light = getLight(sphere);
-      //Añade luz ambiental para poder ver lo que no alumbra la luz puntual
-      var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
-
-      scene.add(ambientLight);
-      scene.add(light);
-      scene.add(leftBorder);
-      scene.add(rightBorder);
-      scene.add(CPU);
-      scene.add(USER);
-      scene.add(sphere);
-      scene.add(floor);
-
-      animate(sphere, borders, renderer, scene, camera);
-   }
+  //--Posición anterior USER (AVANZADO)
+  var previous_position_user;
 
 
-   function animate(sphere, borders, renderer, scene, camera) {
 
-     //--Movimiento de la bola sobre su eje
-     sphere.rotation.y += 0.05;
+  function init() {
+    var scene = new THREE.Scene();
+    var sceneWidth = window.innerWidth;
+    var sceneHeight = window.innerHeight;
 
-     //--Choque con los bordes o con las raquetas
-     checkCollision(sphere,borders)
+    var camera = new THREE.PerspectiveCamera(90, sceneWidth / sceneHeight, 0.01, 100);
+    camera.position.set(0, 0, 15);
+    camera.lookAt(scene.position);
 
-      //--Boton para cambiar la textura de las raquetas
-      var button_skin = document.getElementById("skin");
-      //--Si se aprieta el boton, se mira que textura hay guardada en skin (textura actual)
-      //se cambia la variable y se obtiene de nuevo la textura de las raquetas
-      button_skin.onclick = () => {
-        if (skin == ("skin3.jpg")){
-          skin = "skin2.jpg"
-          scene.getObjectByName("top").material = getOtherMaterial();
-          scene.getObjectByName("down").material = getOtherMaterial();
-        }else{
-          skin ="skin3.jpg"
-          scene.getObjectByName("top").material = getOtherMaterial();
-          scene.getObjectByName("down").material = getOtherMaterial();
-        }
+    var renderer = new THREE.WebGLRenderer({
+      antialias : true;
+    });
+
+    renderer.shadowMap.enabled = true;
+    renderer.setSize(sceneWidth, sceneHeight);
+    document.body.appendChild(renderer.domElement);
+
+    //--Bordes laterales y raquetas
+    var leftBorder = getBorder("left", 1, 20, 1, -7.5, 0, 0);
+    var rightBorder = getBorder("right", 1, 20, 1, 7.5, 0, 0);
+    var CPU = getBorder("top", 3, 1, 1, 0, 10.5, 0);
+    var USER = getBorder("down", 3, 1, 1, 0, -10.5, 0);
+    var borders = [ leftBorder, rightBorder, CPU, USER ];
+
+    //--Bola y suelo
+    var sphere = getSphere();
+    var floor = getFloor();
+
+    //Luz puntual
+    var light = getLight(sphere);
+    //Añade luz ambiental para poder ver lo que no alumbra la luz puntual
+    var ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
+
+    scene.add(ambientLight);
+    scene.add(light);
+    scene.add(leftBorder);
+    scene.add(rightBorder);
+    scene.add(CPU);
+    scene.add(USER);
+    scene.add(sphere);
+    scene.add(floor);
+
+    animate(sphere, borders, renderer, scene, camera);
+  }
+
+
+
+  function animate(sphere, borders, renderer, scene, camera) {
+    //--Movimiento de la bola sobre su eje
+    sphere.rotation.y += 0.05;
+
+    //--Choque con los bordes o con las raquetas
+    checkCollision(sphere,borders)
+
+    //--Boton para cambiar la textura de las raquetas
+    var button_skin = document.getElementById("skin");
+    //--Si se aprieta el boton, se mira que textura hay guardada en skin (textura actual)
+    //se cambia la variable y se obtiene de nuevo la textura de las raquetas
+    button_skin.onclick = () => {
+      if (skin == ("skin3.jpg")){
+        skin = "skin2.jpg"
+        scene.getObjectByName("top").material = getOtherMaterial();
+        scene.getObjectByName("down").material = getOtherMaterial();
+      }else{
+        skin ="skin3.jpg"
+        scene.getObjectByName("top").material = getOtherMaterial();
+        scene.getObjectByName("down").material = getOtherMaterial();
       }
+    }
 
-      //--Niveles de dificultad, se eligen cada vez que se empieza una partida
-      var normal = document.getElementById("normal");
-      var hard = document.getElementById("hard");
+    //--Niveles de dificultad, se eligen cada vez que se empieza una partida
+    var normal = document.getElementById("normal");
+    var hard = document.getElementById("hard");
 
-      //--VELOCIDADES
-      normal.onclick = () => {
-        stepX = 0.05*2*numAleatorio(2,-1);
-        stepY = 0.15*2*numAleatorio(2,-1);
-      }
-      hard.onclick = () => {
-        stepX = 0.05*4*numAleatorio(2,-1);
-        stepY = 0.15*4*numAleatorio(2,-1);
-      }
-      easy.onclick = () => {
-        stepX = 0.05*numAleatorio(2,-1);
-        stepY = 0.15*numAleatorio(2,-1);
-      }
+    //--VELOCIDADES
+    normal.onclick = () => {
+      stepX = 0.05*2*numAleatorio(2,-1);
+      stepY = 0.15*2*numAleatorio(2,-1);
+    }
+    hard.onclick = () => {
+      stepX = 0.05*4*numAleatorio(2,-1);
+      stepY = 0.15*4*numAleatorio(2,-1);
+    }
+    easy.onclick = () => {
+      stepX = 0.05*numAleatorio(2,-1);
+      stepY = 0.15*numAleatorio(2,-1);
+    }
 
-      //--Toma eventos del teclado
-      window.onkeydown = (event) => {
+    //--Toma eventos del teclado
+    window.onkeydown = (event) => {
       //--Para que no pueda utilizar el navegador las tecla
-        event.preventDefault();
-        if (event.key == "ArrowLeft") {
-          racketMoveLeft(borders[3].position.x, borders[3], borders[0])
-        }
-        if (event.key == "ArrowRight") {
-          racketMoveRight(borders[3].position.x, borders[3], borders[1])
-        }
-        //--Comenzará a moverse la bola cuando se pulse la tecla espacio
-        if (event.key == " "){
-          //--Iniciliza cpulose cada juego (aleatorio)
-          cpulose = numAleatorio(5,2);
-          begin = true;
-          //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
-          //pone las puntuaciones a 0 para comenzar una nueva partida
-          newGame("cpu", "player1");
-          newGame("player1", "cpu");
-        }
+      event.preventDefault();
+
+      if (event.key == "ArrowLeft") {
+        racketMoveLeft(borders[3].position.x, borders[3], borders[0])
       }
 
-      //--La bola se mueve si el juego esta inicializado
-      if (begin == true){
-        previous_position_sphere = sphere.position.x;
-        sphere.position.x += stepX;
-        sphere.position.y += stepY;
+      if (event.key == "ArrowRight") {
+        racketMoveRight(borders[3].position.x, borders[3], borders[1])
       }
+      //--Comenzará a moverse la bola cuando se pulse la tecla espacio
+      if (event.key == " "){
+        //--Iniciliza cpulose cada juego (aleatorio)
+        cpulose = numAleatorio(5,2);
+        begin = true;
+        //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
+        //pone las puntuaciones a 0 para comenzar una nueva partida
+        newGame("cpu", "player1");
+        newGame("player1", "cpu");
+      }
+    }
+    //--La bola se mueve si el juego esta inicializado
+    if (begin == true){
+      previous_position_sphere = sphere.position.x;
+      sphere.position.x += stepX;
+      sphere.position.y += stepY;
+    }
 
-      //--Movimiento de la CPU
-      if (sphere.position.x >= borders[2].position.x){
-        if (cpulose < 1){
-          //--Hace que la raqueta se mueva al lado contrario
-          //permite ganar a user
-          racketMoveLeft(borders[2].position.x, borders[2], borders[0])
-        }else{
-          //--Movimiento de la raqueta siguiendo la bola
-          racketMoveRight(sphere.position.x,borders[2],borders[1]);
-        }
+    //--Movimiento de la CPU
+    if (sphere.position.x >= borders[2].position.x){
+      if (cpulose < 1){
+        //--Hace que la raqueta se mueva al lado contrario
+        //permite ganar a user
+        racketMoveLeft(borders[2].position.x, borders[2], borders[0])
+      }else{
+        //--Movimiento de la raqueta siguiendo la bola
+        racketMoveRight(sphere.position.x,borders[2],borders[1]);
       }
+    }
 
       //--Movimiento de la CPU
       if (sphere.position.x < borders[2].position.x){
@@ -311,10 +312,10 @@
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
          //x tiene que ser mayor pero se mantiene la velocidad
           console.log("choque izquierdo");
-          z =  auxilio(positionX_down)
+          factor =  Scale_Factor_Y(positionX_down)
 
           var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*z;
+          stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
           if (previous_position_sphere>=positionX_sphere){
             stepX = (vel_total*0.6) * Math.sign(stepX)
           }else{
@@ -348,25 +349,24 @@
    }
 
    //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
-   function auxilio(positionX){
+   function Scale_Factor_Y(positionX){
      var speed;
      if (previous_position_user == null){
        previous_position_user = 0;
      }
      if (previous_position_user < 0 && positionX<0){
-       mov = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+       movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
      }else if (previous_position_user > 0 && positionX>0) {
-       mov = Math.abs(previous_position_user-positionX_down)
+       movementY = Math.abs(previous_position_user-positionX_down)
      }else{
-       mov = Math.abs(previous_position_user)+Math.abs(positionX)
+       movementY = Math.abs(previous_position_user)+Math.abs(positionX)
      }
 
-     if (mov > 5){
+     if (movementY > 5){
        speed = 1.4;
      }else{
-       speed = (mov*0.1)+0.7;
+       speed = (movementY*0.1)+0.7;
      }
-
      return speed;
    }
 
@@ -456,7 +456,6 @@
 
 </script>
 </head>
-</style>
 
 <body onload="init()">
   <div id = "marcador">
