@@ -266,17 +266,17 @@ Partes implementadas:
       previous_position_user = 0;
     }
     if (previous_position_user < 0 && positionX<0){
-      movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+      movementX = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
     }else if (previous_position_user > 0 && positionX>0) {
-      movementY = Math.abs(previous_position_user-positionX_down)
+      movementX = Math.abs(previous_position_user-positionX_down)
     }else{
-      movementY = Math.abs(previous_position_user)+Math.abs(positionX)
+      movementX = Math.abs(previous_position_user)+Math.abs(positionX)
     }
 
-    if (movementY > 5){
+    if (movementX > 5){
       speed = 1.5;
     }else{
-      speed = (movementY*0.1)+0.7;
+      speed = (movementX*0.1)+0.7;
     }
     return speed;
   }
@@ -328,7 +328,7 @@ Partes implementadas:
 
     //--CONDICNION CHOQUEN EXTREMOS raqueta bottom dependiendo posicion
     if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
-      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
         //x tiene que ser mayor pero se mantiene la velocidad
         console.log("choque izquierdo");
 
@@ -342,7 +342,7 @@ Partes implementadas:
         }
       }
     }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
-      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
         //x tiene que ser mayor pero se mantiene l avelocidad
         console.log("choque lateral derecho")
 
@@ -356,13 +356,13 @@ Partes implementadas:
         }
       }
     }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
-      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
         //x tiene que ser menor pero mantiene velocidad
         console.log("choque en el centro")
 
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
-        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)*factor;
         factor =  Scale_Factor_Y(positionX_down);
+        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)*factor;
         stepX = (vel_total*0.4) * Math.sign(stepX);
       }
     }
