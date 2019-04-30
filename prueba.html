@@ -82,19 +82,20 @@
     sphere.rotation.y += 0.05;
 
     //--Choque con los bordes o con las raquetas
-    checkCollision(sphere,borders)
+    checkCollision(sphere,borders);
 
     //--Boton para cambiar la textura de las raquetas
     var button_skin = document.getElementById("skin");
+
     //--Si se aprieta el boton, se mira que textura hay guardada en skin (textura actual)
     //se cambia la variable y se obtiene de nuevo la textura de las raquetas
     button_skin.onclick = () => {
       if (skin == ("skin3.jpg")){
-        skin = "skin2.jpg"
+        skin = "skin2.jpg";
         scene.getObjectByName("top").material = getOtherMaterial();
         scene.getObjectByName("down").material = getOtherMaterial();
       }else{
-        skin ="skin3.jpg"
+        skin ="skin3.jpg";
         scene.getObjectByName("top").material = getOtherMaterial();
         scene.getObjectByName("down").material = getOtherMaterial();
       }
@@ -122,11 +123,9 @@
     window.onkeydown = (event) => {
       //--Para que no pueda utilizar el navegador las tecla
       event.preventDefault();
-
       if (event.key == "ArrowLeft") {
         racketMoveLeft(borders[3].position.x, borders[3], borders[0])
       }
-
       if (event.key == "ArrowRight") {
         racketMoveRight(borders[3].position.x, borders[3], borders[1])
       }
@@ -141,6 +140,7 @@
         newGame("player1", "cpu");
       }
     }
+
     //--La bola se mueve si el juego esta inicializado
     if (begin == true){
       previous_position_sphere = sphere.position.x;
@@ -153,7 +153,7 @@
       if (cpulose < 1){
         //--Hace que la raqueta se mueva al lado contrario
         //permite ganar a user
-        racketMoveLeft(borders[2].position.x, borders[2], borders[0])
+        racketMoveLeft(borders[2].position.x, borders[2], borders[0]);
       }else{
         //--Movimiento de la raqueta siguiendo la bola
         racketMoveRight(sphere.position.x,borders[2],borders[1]);
@@ -252,6 +252,28 @@
     }
   }
 
+  //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
+  function Scale_Factor_Y(positionX){
+    var speed;
+    if (previous_position_user == null){
+      previous_position_user = 0;
+    }
+    if (previous_position_user < 0 && positionX<0){
+      movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+    }else if (previous_position_user > 0 && positionX>0) {
+      movementY = Math.abs(previous_position_user-positionX_down)
+    }else{
+      movementY = Math.abs(previous_position_user)+Math.abs(positionX)
+    }
+
+    if (movementY > 5){
+      speed = 1.5;
+    }else{
+      speed = (movementY*0.1)+0.7;
+    }
+    return speed;
+  }
+
 
   //--Comprueba choques
   function checkCollision(sphere,borders){
@@ -262,14 +284,10 @@
 
     //--PARAMETROS BORDE IZQUIERDO
     positionX_left = borders[0].position.x;
-    positionY_left = borders[0].position.y;
-    height_left = borders[0].geometry.parameters.height;
     width_left = borders[0].geometry.parameters.width;
 
     //--PARAMETROS DERECHO
     positionX_right = borders[1].position.x;
-    positionY_right = borders[1].position.y;
-    height_right = borders[1].geometry.parameters.height;
     width_right = borders[1].geometry.parameters.width;
 
     //--PARAMETROS top
@@ -306,9 +324,9 @@
       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
         //x tiene que ser mayor pero se mantiene la velocidad
         console.log("choque izquierdo");
-        factor =  Scale_Factor_Y(positionX_down)
 
-        var vel_total = Math.abs(stepX) + Math.abs(stepY)
+        var vel_total = Math.abs(stepX) + Math.abs(stepY);
+        factor =  Scale_Factor_Y(positionX_down);
         stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
         if (previous_position_sphere>=positionX_sphere){
           stepX = (vel_total*0.6) * Math.sign(stepX)
@@ -321,8 +339,9 @@
         //x tiene que ser mayor pero se mantiene l avelocidad
         console.log("choque lateral derecho")
 
-        var vel_total = Math.abs(stepX) + Math.abs(stepY)
-        stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+        var vel_total = Math.abs(stepX) + Math.abs(stepY);
+        factor =  Scale_Factor_Y(positionX_down);
+        stepY = -1 * 0.4 * vel_total * Math.sign(stepY)*factor;
         if (previous_position_sphere>=positionX_sphere){
           stepX = (vel_total*0.6) * Math.sign(stepX)*-1
         }else{
@@ -334,34 +353,12 @@
         //x tiene que ser menor pero mantiene velocidad
         console.log("choque en el centro")
 
-        var vel_total = Math.abs(stepX) + Math.abs(stepY)
-        stepX = (vel_total*0.4) * Math.sign(stepX)
-        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)
+        var vel_total = Math.abs(stepX) + Math.abs(stepY);
+        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)*factor;
+        factor =  Scale_Factor_Y(positionX_down);
+        stepX = (vel_total*0.4) * Math.sign(stepX);
       }
     }
-  }
-
-
-  //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
-  function Scale_Factor_Y(positionX){
-    var speed;
-    if (previous_position_user == null){
-      previous_position_user = 0;
-    }
-    if (previous_position_user < 0 && positionX<0){
-      movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
-    }else if (previous_position_user > 0 && positionX>0) {
-      movementY = Math.abs(previous_position_user-positionX_down)
-    }else{
-      movementY = Math.abs(previous_position_user)+Math.abs(positionX)
-    }
-
-    if (movementY > 5){
-      speed = 1.4;
-    }else{
-      speed = (movementY*0.1)+0.7;
-    }
-    return speed;
   }
 
 
