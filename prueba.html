@@ -310,30 +310,14 @@
      if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
          //x tiene que ser mayor pero se mantiene la velocidad
-          console.log("choque izquierdo")
-          //-----------------------------------------------------------------------------------------
-          if (previous_position_user < 0 && positionX_down<0){
-            mov = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX_down))
-          }else if (previous_position_user > 0 && positionX_down>0) {
-            mov = Math.abs(previous_position_user-positionX_down)
-          }else{
-            mov = Math.abs(previous_position_user)+Math.abs(positionX_down)
-          }
-
-          if (mov > 5){
-            movy = 1.4;
-          }else{
-            movy = (mov*0.1) + 0.7;
-          }
-
+          console.log("choque izquierdo");
           var vel_total = Math.abs(stepX) + Math.abs(stepY)
+          stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
           if (previous_position_sphere>=positionX_sphere){
             stepX = (vel_total*0.6) * Math.sign(stepX)
           }else{
             stepX = (vel_total*0.6) * Math.sign(stepX)*-1
           }
-
-          stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*movy;
        }
      }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
@@ -347,7 +331,6 @@
           }else{
             stepX = (vel_total*0.6) * Math.sign(stepX)
           }
-
        }
      }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
