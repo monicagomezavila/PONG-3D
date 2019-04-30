@@ -40,7 +40,7 @@
     camera.lookAt(scene.position);
 
     var renderer = new THREE.WebGLRenderer({
-      antialias : true;
+      antialias : true
     });
 
     renderer.shadowMap.enabled = true;
@@ -160,297 +160,293 @@
       }
     }
 
-      //--Movimiento de la CPU
-      if (sphere.position.x < borders[2].position.x){
-        if (cpulose < 1){
-          //--Hace que la raqueta se mueva al lado contrario
-          //permite ganar a user
-          racketMoveRight(borders[2].position.x,borders[2], borders[1])
+    //--Movimiento de la CPU
+    if (sphere.position.x < borders[2].position.x){
+      if (cpulose < 1){
+        //--Hace que la raqueta se mueva al lado contrario
+        //permite ganar a user
+        racketMoveRight(borders[2].position.x,borders[2], borders[1])
+      }else{
+        //--Movimiento de la raqueta siguiendo la bola
+        racketMoveLeft(sphere.position.x,borders[2], borders[0])
+      }
+    }
+
+    //--Condicion pierde el USER
+    if (sphere.position.y<borders[3].position.y){
+      winner(sphere,"cpu");
+    }
+
+    //--Condicion pierde CPU
+    if (sphere.position.y>borders[2].position.y){
+      winner(sphere, "player1")
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(function() {
+      animate(sphere, borders, renderer, scene, camera);
+    });
+  }
+
+
+  //--Función que devuleve un número aleatorio entre el minimo incluido y el maximo sin incluir
+  function numAleatorio(max, min){
+    var aleatorio = Math.floor(Math.random() * (max-min)+min);
+    if (aleatorio == 0){
+      aleatorio = 1;
+    }
+    return(aleatorio);
+  }
+
+
+  //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
+  //pone las puntuaciones a 0 para comezar una nueva partida
+  function newGame(id, id2){
+    if (document.getElementById(id).innerHTML == 5){
+      document.getElementById(id).innerHTML = 0;
+      document.getElementById(id2).innerHTML = 0;
+      document.getElementById("winner").innerHTML = null;
+      //--Elimina el letrero del ganador
+      document.getElementById("winner").innerHTML = null;
+    }
+  }
+
+
+  //--Se le pasa la bola y el nombre del ganador
+  //comprueba si ha gnado un juego o ha ganado la partida
+  function winner(sphere, id){
+    sphere.position.y = 0;
+    sphere.position.x = 0;
+    begin = false;
+    if (document.getElementById(id).innerHTML == 4){
+      document.getElementById("winner").innerHTML = id + "wins!, pulse space for new game";
+      document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
+    }else{
+      document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
+    }
+    stepX = 0.05;
+    stepY = 0.15;
+  }
+
+
+  //--Funcion movimiento de raqueta a la izquierda
+  function racketMoveLeft(position_init,racket, wall, move){
+    //--Desplazamiento de la raqueta
+    var move = 0.25;
+    var position_end_racket = position_init - racket.geometry.parameters.width/2;
+    var position_end_wall = wall.position.x + wall.geometry.parameters.width/2;
+    if (position_end_racket - move >= position_end_wall){
+      racket.position.x -= move;
+    }
+  }
+
+
+  //--Funcion movimiento de raqueta a la derecha
+  function racketMoveRight(position_init, racket, wall){
+    //--Desplazamiento de la raqueta
+    var move = 0.25;
+    var position_end_racket = position_init + racket.geometry.parameters.width/2;
+    var position_end_wall = wall.position.x - wall.geometry.parameters.width/2;
+    if (position_end_racket + move <= position_end_wall){
+      racket.position.x += move;
+    }
+  }
+
+
+  //--Comprueba choques
+  function checkCollision(sphere,borders){
+    //--PARAMETROS ESFERA
+    positionX_sphere = sphere.position.x;
+    positionY_sphere = sphere.position.y;
+    radius_sphere = sphere.geometry.parameters.radius;
+
+    //--PARAMETROS BORDE IZQUIERDO
+    positionX_left = borders[0].position.x;
+    positionY_left = borders[0].position.y;
+    height_left = borders[0].geometry.parameters.height;
+    width_left = borders[0].geometry.parameters.width;
+
+    //--PARAMETROS DERECHO
+    positionX_right = borders[1].position.x;
+    positionY_right = borders[1].position.y;
+    height_right = borders[1].geometry.parameters.height;
+    width_right = borders[1].geometry.parameters.width;
+
+    //--PARAMETROS top
+    positionX_top = borders[2].position.x;
+    positionY_top = borders[2].position.y;
+    width_top = borders[2].geometry.parameters.width;
+    height_top = borders[2].geometry.parameters.height;
+
+    //--PARAMETROS down
+    positionX_down = borders[3].position.x;
+    width_down = borders[3].geometry.parameters.width;
+    height_down = borders[3].geometry.parameters.height;
+    positionY_down = borders[3].position.y;
+
+    //--CONDICION CHOQUE LEFT
+    if ((positionX_sphere-(radius_sphere/2)) <= (positionX_left+(width_left/2))){
+      stepX *= -1;
+    //--CONDICION CHOQUE CON EL right
+    }else if ((positionX_sphere+(radius_sphere/2))>=(positionX_right-(width_right/2))){
+      stepX *= -1;
+    }
+
+    //--CONDICION CHOQUE top
+    if (((positionX_top-(width_top/2))<=positionX_sphere) && (positionX_sphere<=((positionX_top+(width_top/2))))){
+      if ((positionY_sphere+(radius_sphere/2))>= (positionY_top-(height_top/2))){
+        stepY *= -1
+        previous_position_user = positionX_down;
+      }
+    }
+
+
+    //--CONDICNION CHOQUEN EXTREMOS raqueta bottom dependiendo posicion
+    if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+        //x tiene que ser mayor pero se mantiene la velocidad
+        console.log("choque izquierdo");
+        factor =  Scale_Factor_Y(positionX_down)
+
+        var vel_total = Math.abs(stepX) + Math.abs(stepY)
+        stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
+        if (previous_position_sphere>=positionX_sphere){
+          stepX = (vel_total*0.6) * Math.sign(stepX)
         }else{
-          //--Movimiento de la raqueta siguiendo la bola
-          racketMoveLeft(sphere.position.x,borders[2], borders[0])
+          stepX = (vel_total*0.6) * Math.sign(stepX)*-1
         }
       }
+    }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+        //x tiene que ser mayor pero se mantiene l avelocidad
+        console.log("choque lateral derecho")
 
-      //--Condicion pierde el USER
-      if (sphere.position.y<borders[3].position.y){
-        winner(sphere,"cpu");
+        var vel_total = Math.abs(stepX) + Math.abs(stepY)
+        stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+        if (previous_position_sphere>=positionX_sphere){
+          stepX = (vel_total*0.6) * Math.sign(stepX)*-1
+        }else{
+          stepX = (vel_total*0.6) * Math.sign(stepX)
+        }
       }
+    }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+        //x tiene que ser menor pero mantiene velocidad
+        console.log("choque en el centro")
 
-      //--Condicion pierde CPU
-      if (sphere.position.y>borders[2].position.y){
-        winner(sphere, "player1")
+        var vel_total = Math.abs(stepX) + Math.abs(stepY)
+        stepX = (vel_total*0.4) * Math.sign(stepX)
+        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)
       }
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(function() {
-         animate(sphere, borders, renderer, scene, camera);
-      });
-   }
+    }
+  }
 
 
+  //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
+  function Scale_Factor_Y(positionX){
+    var speed;
+    if (previous_position_user == null){
+      previous_position_user = 0;
+    }
+    if (previous_position_user < 0 && positionX<0){
+      movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+    }else if (previous_position_user > 0 && positionX>0) {
+      movementY = Math.abs(previous_position_user-positionX_down)
+    }else{
+      movementY = Math.abs(previous_position_user)+Math.abs(positionX)
+    }
 
-   //--Función que devuleve un número aleatorio entre el minimo incluido y el maximo sin incluir
-   function numAleatorio(max, min){
-     var aleatorio = Math.floor(Math.random() * (max-min)+min);
-     if (aleatorio == 0){
-       aleatorio = 1;
-     }
-     return(aleatorio);
-   }
-
-
-
-   //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
-   //pone las puntuaciones a 0 para comezar una nueva partida
-   function newGame(id, id2){
-
-     if (document.getElementById(id).innerHTML == 5){
-       document.getElementById(id).innerHTML = 0;
-       document.getElementById(id2).innerHTML = 0;
-       document.getElementById("winner").innerHTML = null;
-       //--Elimina el letrero del ganador
-       document.getElementById("winner").innerHTML = null;
-     }
-   }
+    if (movementY > 5){
+      speed = 1.4;
+    }else{
+      speed = (movementY*0.1)+0.7;
+    }
+    return speed;
+  }
 
 
-
-   //--Se le pasa la bola y el nombre del ganador
-   //comprueba si ha gnado un juego o ha ganado la partida
-   function winner(sphere, id){
-     sphere.position.y = 0;
-     sphere.position.x = 0;
-     begin = false;
-     if (document.getElementById(id).innerHTML == 4){
-       document.getElementById("winner").innerHTML = id + "wins!, pulse space for new game";
-       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
-     }else{
-       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
-     }
-     stepX = 0.05;
-     stepY = 0.15;
-   }
+  //--Luz puntual
+  function getLight(sphere) {
+    var spotLight = new THREE.SpotLight();
+    //--La luz sigue a la bola
+    spotLight.target = sphere;
+    spotLight.position.set(-10, 5, 7);
+    spotLight.angle = Math.PI / 20;
+    spotLight.penumbra = 0.3;
+    spotLight.castShadow = true;
+    spotLight.shadow.mapSize.width = 4096;
+    spotLight.shadow.mapSize.height = 4096;
+    return spotLight;
+  }
 
 
-
-   //--Funcion movimiento de raqueta a la izquierda
-   function racketMoveLeft(position_init,racket, wall, move){
-     //--Desplazamiento de la raqueta
-     var move = 0.25;
-     var position_end_racket = position_init - racket.geometry.parameters.width/2;
-     var position_end_wall = wall.position.x + wall.geometry.parameters.width/2;
-     if (position_end_racket - move >= position_end_wall){
-       racket.position.x -= move;
-     }
-   }
+  //--Crea la bola
+  function getSphere() {
+    var geometry = new THREE.SphereGeometry(0.8, 20, 20);
+    var mesh = new THREE.Mesh(geometry, getSphereMaterial());
+    mesh.castShadow = true;
+    return mesh;
+  }
 
 
 
-   //--Funcion movimiento de raqueta a la derecha
-   function racketMoveRight(position_init, racket, wall){
-     //--Desplazamiento de la raqueta
-     var move = 0.25;
-     var position_end_racket = position_init + racket.geometry.parameters.width/2;
-     var position_end_wall = wall.position.x - wall.geometry.parameters.width/2;
-     if (position_end_racket + move <= position_end_wall){
-       racket.position.x += move;
-     }
-   }
+  //--Crea el suelo
+  function getFloor() {
+    var geometry = new THREE.PlaneGeometry(15, 20);
+    var mesh = new THREE.Mesh(geometry, getWoodMaterial());
+    mesh.receiveShadow = true;
+    return mesh;
+  }
 
 
-
-   function checkCollision(sphere,borders){
-     //--PARAMETROS ESFERA
-     positionX_sphere = sphere.position.x;
-     positionY_sphere = sphere.position.y;
-     radius_sphere = sphere.geometry.parameters.radius;
-
-     //--PARAMETROS BORDE IZQUIERDO
-     positionX_left = borders[0].position.x;
-     positionY_left = borders[0].position.y;
-     height_left = borders[0].geometry.parameters.height;
-     width_left = borders[0].geometry.parameters.width;
-
-
-     //--PARAMETROS DERECHO
-     positionX_right = borders[1].position.x;
-     positionY_right = borders[1].position.y;
-     height_right = borders[1].geometry.parameters.height;
-     width_right = borders[1].geometry.parameters.width;
-
-     //--PARAMETROS top
-     positionX_top = borders[2].position.x;
-     positionY_top = borders[2].position.y;
-     width_top = borders[2].geometry.parameters.width;
-     height_top = borders[2].geometry.parameters.height;
-
-     //--PARAMETROS down
-     positionX_down = borders[3].position.x;
-     width_down = borders[3].geometry.parameters.width;
-     height_down = borders[3].geometry.parameters.height;
-     positionY_down = borders[3].position.y;
-
-     //--CONDICION CHOQUE LEFT
-     if ((positionX_sphere-(radius_sphere/2)) <= (positionX_left+(width_left/2))){
-       stepX *= -1;
-    //--CONDICION CHOQUE CON EL right
-     }else if ((positionX_sphere+(radius_sphere/2))>=(positionX_right-(width_right/2))){
-       stepX *= -1;
-     }
-
-     //--CONDICION CHOQUE top
-     if (((positionX_top-(width_top/2))<=positionX_sphere) && (positionX_sphere<=((positionX_top+(width_top/2))))){
-       if ((positionY_sphere+(radius_sphere/2))>= (positionY_top-(height_top/2))){
-         stepY *= -1
-         previous_position_user = positionX_down;
-       }
-     }
-
-     //--CONDICNION CHOQUEN EXTREMOS raqueta bottom dependiendo posicion
-     if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
-       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-         //x tiene que ser mayor pero se mantiene la velocidad
-          console.log("choque izquierdo");
-          factor =  Scale_Factor_Y(positionX_down)
-
-          var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
-          if (previous_position_sphere>=positionX_sphere){
-            stepX = (vel_total*0.6) * Math.sign(stepX)
-          }else{
-            stepX = (vel_total*0.6) * Math.sign(stepX)*-1
-          }
-       }
-     }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
-       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-         //x tiene que ser mayor pero se mantiene l avelocidad
-          console.log("choque lateral derecho")
-
-          var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
-          if (previous_position_sphere>=positionX_sphere){
-            stepX = (vel_total*0.6) * Math.sign(stepX)*-1
-          }else{
-            stepX = (vel_total*0.6) * Math.sign(stepX)
-          }
-       }
-     }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
-       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-         //x tiene que ser menor pero mantiene velocidad
-         console.log("choque en el centro")
-
-         var vel_total = Math.abs(stepX) + Math.abs(stepY)
-         stepX = (vel_total*0.4) * Math.sign(stepX)
-         stepY = -1 * 0.6 * vel_total * Math.sign(stepY)
-       }
-     }
-
-   }
-
-   //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
-   function Scale_Factor_Y(positionX){
-     var speed;
-     if (previous_position_user == null){
-       previous_position_user = 0;
-     }
-     if (previous_position_user < 0 && positionX<0){
-       movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
-     }else if (previous_position_user > 0 && positionX>0) {
-       movementY = Math.abs(previous_position_user-positionX_down)
-     }else{
-       movementY = Math.abs(previous_position_user)+Math.abs(positionX)
-     }
-
-     if (movementY > 5){
-       speed = 1.4;
-     }else{
-       speed = (movementY*0.1)+0.7;
-     }
-     return speed;
-   }
-
-
-   //--Luz puntual
-   function getLight(sphere) {
-      var spotLight = new THREE.SpotLight();
-      //--La luz sigue a la bola
-      spotLight.target = sphere;
-      spotLight.position.set(-10, 5, 7);
-      spotLight.angle = Math.PI / 20;
-      spotLight.penumbra = 0.3;
-      spotLight.castShadow = true;
-      spotLight.shadow.mapSize.width = 4096;
-      spotLight.shadow.mapSize.height = 4096;
-      return spotLight;
-   }
-
-
-   //--Crea la bola
-   function getSphere() {
-      var geometry = new THREE.SphereGeometry(0.8, 20, 20);
-      var mesh = new THREE.Mesh(geometry, getSphereMaterial());
-      mesh.castShadow = true;
-      return mesh;
-   }
-
-
-   //--Crea el suelo
-   function getFloor() {
-      var geometry = new THREE.PlaneGeometry(15, 20);
+  //--Crea los bordes
+  function getBorder(name, x, y, z, posX, posY, posZ) {
+    var geometry = new THREE.BoxGeometry(x, y, z);
+    if (name == "top" || name == "down"){
+      var mesh = new THREE.Mesh(geometry, getOtherMaterial());
+    }else{
       var mesh = new THREE.Mesh(geometry, getWoodMaterial());
-      mesh.receiveShadow = true;
-      return mesh;
-   }
+    }
+    mesh.receiveShadow = true;
+    mesh.position.set(posX, posY, posZ);
+    mesh.name = name;
+    mesh.receiveShadow = true;
+    return mesh;
+  }
 
 
-   //--Crea los bordes
-   function getBorder(name, x, y, z, posX, posY, posZ) {
-      var geometry = new THREE.BoxGeometry(x, y, z);
-      if (name == "top" || name == "down"){
-        var mesh = new THREE.Mesh(geometry, getOtherMaterial());
-      }else{
-        var mesh = new THREE.Mesh(geometry, getWoodMaterial());
-      }
-
-      mesh.receiveShadow = true;
-      mesh.position.set(posX, posY, posZ);
-      mesh.name = name;
-      mesh.receiveShadow = true;
-      return mesh;
-   }
+  //--Textura madera
+  function getWoodMaterial() {
+    var texture = new THREE.TextureLoader().load("wood.png");
+    var material = new THREE.MeshPhysicalMaterial({
+      map : texture
+    });
+    material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
+    material.map.repeat.set(4, 4);
+    material.side = THREE.DoubleSide;
+    return material;
+  }
 
 
-   //--Textura madera
-   function getWoodMaterial() {
-      var texture = new THREE.TextureLoader().load("wood.png");
-      var material = new THREE.MeshPhysicalMaterial({
-         map : texture
-      });
-      material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
-      material.map.repeat.set(4, 4);
-      material.side = THREE.DoubleSide;
-      return material;
-   }
+  //--Otra textura
+  function getOtherMaterial(){
+    var texture = new THREE.TextureLoader().load(skin);
+    var material = new THREE.MeshPhysicalMaterial({
+      map : texture
+    });
+    material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
+    material.side = THREE.DoubleSide;
+    return material;
+  }
 
-   //--Otra textura
-   function getOtherMaterial(){
-     var texture = new THREE.TextureLoader().load(skin);
-     var material = new THREE.MeshPhysicalMaterial({
-        map : texture
-     });
-     material.map.wrapS = material.map.wrapT = THREE.RepeatWrapping;
-     material.side = THREE.DoubleSide;
-     return material;
-   }
 
-   //--Textura de la bola
-   function getSphereMaterial(){
-     var texture = new THREE.TextureLoader().load("face.jpg");
-     var material = new THREE.MeshPhysicalMaterial({
-        map : texture
-     });
-     return material;
+  //--Textura de la bola
+  function getSphereMaterial(){
+    var texture = new THREE.TextureLoader().load("face.jpg");
+    var material = new THREE.MeshPhysicalMaterial({
+      map : texture
+    });
+    return material;
    }
 
 
