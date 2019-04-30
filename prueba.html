@@ -311,8 +311,10 @@
        if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
          //x tiene que ser mayor pero se mantiene la velocidad
           console.log("choque izquierdo");
+          z =  auxilio(positionX_down)
+
           var vel_total = Math.abs(stepX) + Math.abs(stepY)
-          stepY = -1 * 0.4 * vel_total * Math.sign(stepY)
+          stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*z;
           if (previous_position_sphere>=positionX_sphere){
             stepX = (vel_total*0.6) * Math.sign(stepX)
           }else{
@@ -343,6 +345,29 @@
        }
      }
 
+   }
+
+   //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
+   function auxilio(positionX){
+     var speed;
+     if (previous_position_user == null){
+       previous_position_user = 0;
+     }
+     if (previous_position_user < 0 && positionX<0){
+       mov = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+     }else if (previous_position_user > 0 && positionX>0) {
+       mov = Math.abs(previous_position_user-positionX_down)
+     }else{
+       mov = Math.abs(previous_position_user)+Math.abs(positionX)
+     }
+
+     if (mov > 5){
+       speed = 1.4;
+     }else{
+       speed = (mov*0.1)+0.7;
+     }
+
+     return speed;
    }
 
 
