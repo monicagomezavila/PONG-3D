@@ -14,8 +14,7 @@ Partes implementadas:
 
 <script>
 
-  //--Movimiento bola inicial, definido por si no se elige dificultad
-  //--Aleatoriedad hacia CPU o USER e izq o drch
+  //--Movimiento bola inicial, definido por si no se elige dificultad al empezar
   var stepX = 0.05 * numAleatorio(2,-1);
   var stepY = 0.15* numAleatorio(2,-1);
 
@@ -85,17 +84,18 @@ Partes implementadas:
 
 
   function animate(sphere, borders, renderer, scene, camera) {
+
     //--Movimiento de la bola sobre su eje
     sphere.rotation.y += 0.05;
 
     //--Choque con los bordes o con las raquetas
     checkCollision(sphere,borders);
 
-    //--Boton para cambiar la textura de las raquetas
+    //--Botón para cambiar la textura de las raquetas
     var button_skin = document.getElementById("skin");
 
-    //--Si se aprieta el boton, se mira que textura hay guardada en skin (textura actual)
-    //se cambia la variable y se obtiene de nuevo la textura de las raquetas
+    //--Si se aprieta el botón, se mira que textura hay guardada en skin (textura actual)
+    //--Se cambia la variable y se obtiene de nuevo la textura de las raquetas
     button_skin.onclick = () => {
       if (skin == ("skin3.jpg")){
         skin = "skin2.jpg";
@@ -108,11 +108,11 @@ Partes implementadas:
       }
     }
 
-    //--Niveles de dificultad, se eligen cada vez que se empieza una partida
+    //--Niveles de dificultad, se eligen cada vez que se empieza un juego, por defecto estará easy
     var normal = document.getElementById("normal");
     var hard = document.getElementById("hard");
+    var easy = document.getElementById("easy");
 
-    //--VELOCIDADES
     normal.onclick = () => {
       stepX = 0.05*2*numAleatorio(2,-1);
       stepY = 0.15*2*numAleatorio(2,-1);
@@ -128,7 +128,6 @@ Partes implementadas:
 
     //--Toma eventos del teclado
     window.onkeydown = (event) => {
-      //--Para que no pueda utilizar el navegador las tecla
       event.preventDefault();
       if (event.key == "ArrowLeft") {
         racketMoveLeft(borders[3].position.x, borders[3], borders[0])
@@ -150,6 +149,7 @@ Partes implementadas:
 
     //--La bola se mueve si el juego esta inicializado
     if (begin == true){
+      //--Guarda la posición anterior de la bola
       previous_position_sphere = sphere.position.x;
       sphere.position.x += stepX;
       sphere.position.y += stepY;
@@ -196,7 +196,7 @@ Partes implementadas:
   }
 
 
-  //--Función que devuleve un número aleatorio entre el minimo incluido y el maximo sin incluir
+  //--Función que devuleve un número aleatorio entre el mínimo incluido y el máximo sin incluir
   function numAleatorio(max, min){
     var aleatorio = Math.floor(Math.random() * (max-min)+min);
     if (aleatorio == 0){
@@ -206,13 +206,12 @@ Partes implementadas:
   }
 
 
-  //--Si en el juego anterior un jugador ya habia ganado una los 5 juegos de una partida,
-  //pone las puntuaciones a 0 para comezar una nueva partida
+  //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
+  //--Pone las puntuaciones a 0 para comezar una nueva partida
   function newGame(id, id2){
     if (document.getElementById(id).innerHTML == 5){
       document.getElementById(id).innerHTML = 0;
       document.getElementById(id2).innerHTML = 0;
-      document.getElementById("winner").innerHTML = null;
       //--Elimina el letrero del ganador
       document.getElementById("winner").innerHTML = null;
     }
@@ -220,7 +219,7 @@ Partes implementadas:
 
 
   //--Se le pasa la bola y el nombre del ganador
-  //comprueba si ha gnado un juego o ha ganado la partida
+  //--Comprueba si ha ganado un juego o ha ganado la partida
   function winner(sphere, id){
     sphere.position.y = 0;
     sphere.position.x = 0;
@@ -231,8 +230,9 @@ Partes implementadas:
     }else{
       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
     }
-    stepX = 0.05;
-    stepY = 0.15;
+    //--Pone la velocidad en easy si no se elige ninguna antes de cada juego
+    stepX = 0.05 * numAleatorio(2,-1);
+    stepY = 0.15 * numAleatorio(2,-1);
   }
 
 
@@ -259,24 +259,25 @@ Partes implementadas:
     }
   }
 
-  //--Función que da un factor para ponderar la velocidad en y dependiendo las posisciones de User
+  //--Función que da un factor para ponderar la velocidad en y dependiendo las posiciones de User
+  //--AVANZADO, explicado con más detalle en el pdf
   function Scale_Factor_Y(positionX){
     var speed;
     if (previous_position_user == null){
       previous_position_user = 0;
     }
     if (previous_position_user < 0 && positionX<0){
-      movementX = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
+      movementY = Math.abs(Math.abs(previous_position_user)-Math.abs(positionX))
     }else if (previous_position_user > 0 && positionX>0) {
-      movementX = Math.abs(previous_position_user-positionX_down)
+      movementY = Math.abs(previous_position_user-positionX_down)
     }else{
-      movementX = Math.abs(previous_position_user)+Math.abs(positionX)
+      movementY = Math.abs(previous_position_user)+Math.abs(positionX)
     }
 
-    if (movementX > 5){
+    if (movementY > 5){
       speed = 1.5;
     }else{
-      speed = (movementX*0.1)+0.7;
+      speed = (movementY*0.1)+0.7;
     }
     return speed;
   }
@@ -309,15 +310,15 @@ Partes implementadas:
     height_down = borders[3].geometry.parameters.height;
     positionY_down = borders[3].position.y;
 
-    //--CONDICION CHOQUE LEFT
+    //--CONDICION CHOQUE BORDE LEFT
     if ((positionX_sphere-(radius_sphere/2)) <= (positionX_left+(width_left/2))){
       stepX *= -1;
-    //--CONDICION CHOQUE CON EL right
+    //--CONDICION CHOQUE BORDE RIGHT
     }else if ((positionX_sphere+(radius_sphere/2))>=(positionX_right-(width_right/2))){
       stepX *= -1;
     }
 
-    //--CONDICION CHOQUE top
+    //--CONDICION CHOQUE RAQUETA TOP (CPU)
     if (((positionX_top-(width_top/2))<=positionX_sphere) && (positionX_sphere<=((positionX_top+(width_top/2))))){
       if ((positionY_sphere+(radius_sphere/2))>= (positionY_top-(height_top/2))){
         stepY *= -1
@@ -326,43 +327,39 @@ Partes implementadas:
     }
 
 
-    //--CONDICNION CHOQUEN EXTREMOS raqueta bottom dependiendo posicion
+    //--CONDICIONES DE CHOQUE CON DOWN (USER), explicado más detalladamente en el pdf
     if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
-      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
-        //x tiene que ser mayor pero se mantiene la velocidad
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
         console.log("choque izquierdo");
-
+        console.log(positionY_down+(height_down/2))
+        console.log(positionY_sphere-radius_sphere)
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
         stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
         if (previous_position_sphere>=positionX_sphere){
-          stepX = (vel_total*0.6) * Math.sign(stepX)
+          stepX = (vel_total*0.6) * Math.sign(stepX);
         }else{
-          stepX = (vel_total*0.6) * Math.sign(stepX)*-1
+          stepX = (vel_total*0.6) * Math.sign(stepX)*-1;
         }
       }
     }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
-      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
-        //x tiene que ser mayor pero se mantiene l avelocidad
-        console.log("choque lateral derecho")
-
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+        console.log("choque lateral derecho");
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
-        stepY = -1 * 0.4 * vel_total * Math.sign(stepY)*factor;
+        stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
         if (previous_position_sphere>=positionX_sphere){
-          stepX = (vel_total*0.6) * Math.sign(stepX)*-1
+          stepX = (vel_total*0.6) * Math.sign(stepX)*-1;
         }else{
-          stepX = (vel_total*0.6) * Math.sign(stepX)
+          stepX = (vel_total*0.6) * Math.sign(stepX);
         }
       }
     }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
-      if ((positionY_sphere-radius_sphere)<= (positionY_down+(height_down/2))){
-        //x tiene que ser menor pero mantiene velocidad
-        console.log("choque en el centro")
-
+      if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
+        console.log("choque en el centro");
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
-        stepY = -1 * 0.6 * vel_total * Math.sign(stepY)*factor;
+        stepY = (-1 * 0.6 * vel_total * Math.sign(stepY))*factor;
         stepX = (vel_total*0.4) * Math.sign(stepX);
       }
     }
