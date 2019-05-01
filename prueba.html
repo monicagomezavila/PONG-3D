@@ -331,8 +331,6 @@ Partes implementadas:
     if (((positionX_down-(width_down/2))<=positionX_sphere) && ((positionX_down-(width_down/2)+(width_down/3))>positionX_sphere)){
       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
         console.log("choque izquierdo");
-        console.log(positionY_down+(height_down/2))
-        console.log(positionY_sphere-radius_sphere)
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
         stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
