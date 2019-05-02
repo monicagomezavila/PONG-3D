@@ -285,40 +285,40 @@ Partes implementadas:
 
   //--Comprueba choques
   function checkCollision(sphere,borders){
-    //--PARAMETROS ESFERA
+    //--PARÁMETROS ESFERA
     positionX_sphere = sphere.position.x;
     positionY_sphere = sphere.position.y;
     radius_sphere = sphere.geometry.parameters.radius;
 
-    //--PARAMETROS BORDE IZQUIERDO
+    //--PARÁMETROS BORDE IZQUIERDO
     positionX_left = borders[0].position.x;
     width_left = borders[0].geometry.parameters.width;
 
-    //--PARAMETROS DERECHO
+    //--PARÁMETROS DERECHO
     positionX_right = borders[1].position.x;
     width_right = borders[1].geometry.parameters.width;
 
-    //--PARAMETROS top
+    //--PARÁMETROS top
     positionX_top = borders[2].position.x;
     positionY_top = borders[2].position.y;
     width_top = borders[2].geometry.parameters.width;
     height_top = borders[2].geometry.parameters.height;
 
-    //--PARAMETROS down
+    //--PARÁMETROS down
     positionX_down = borders[3].position.x;
     width_down = borders[3].geometry.parameters.width;
     height_down = borders[3].geometry.parameters.height;
     positionY_down = borders[3].position.y;
 
-    //--CONDICION CHOQUE BORDE LEFT
+    //--CONDICIÓN CHOQUE BORDE LEFT
     if ((positionX_sphere-(radius_sphere/2)) <= (positionX_left+(width_left/2))){
       stepX *= -1;
-    //--CONDICION CHOQUE BORDE RIGHT
+    //--CONDICIÓN CHOQUE BORDE RIGHT
     }else if ((positionX_sphere+(radius_sphere/2))>=(positionX_right-(width_right/2))){
       stepX *= -1;
     }
 
-    //--CONDICION CHOQUE RAQUETA TOP (CPU)
+    //--CONDICIÓN CHOQUE RAQUETA TOP (CPU)
     if (((positionX_top-(width_top/2))<=positionX_sphere) && (positionX_sphere<=((positionX_top+(width_top/2))))){
       if ((positionY_sphere+(radius_sphere/2))>= (positionY_top-(height_top/2))){
         stepY *= -1
