@@ -18,7 +18,7 @@ Partes implementadas:
   var stepX = 0.05 * numAleatorio(2,-1);
   var stepY = 0.15* numAleatorio(2,-1);
 
-  //--Boolean = true si le das a la tecla de espacio, empieza el juego
+  //--Boolean igual a true si le das a la tecla de espacio y empieza el juego
   //--Pasa a false cuando un CPU o USER ganan un juego
   var begin = false;
 
@@ -147,7 +147,7 @@ Partes implementadas:
       }
     }
 
-    //--La bola se mueve si el juego esta inicializado
+    //--La bola se mueve si el juego está inicializado
     if (begin == true){
       //--Guarda la posición anterior de la bola
       previous_position_sphere = sphere.position.x;
@@ -159,7 +159,7 @@ Partes implementadas:
     if (sphere.position.x >= borders[2].position.x){
       if (cpulose < 1){
         //--Hace que la raqueta se mueva al lado contrario
-        //permite ganar a user
+        //--Permite ganar a user
         racketMoveLeft(borders[2].position.x, borders[2], borders[0]);
       }else{
         //--Movimiento de la raqueta siguiendo la bola
@@ -171,7 +171,7 @@ Partes implementadas:
     if (sphere.position.x < borders[2].position.x){
       if (cpulose < 1){
         //--Hace que la raqueta se mueva al lado contrario
-        //permite ganar a user
+        //--Permite ganar a user
         racketMoveRight(borders[2].position.x,borders[2], borders[1])
       }else{
         //--Movimiento de la raqueta siguiendo la bola
@@ -179,12 +179,12 @@ Partes implementadas:
       }
     }
 
-    //--Condicion pierde el USER
+    //--Condición pierde el USER
     if (sphere.position.y<borders[3].position.y){
       winner(sphere,"cpu");
     }
 
-    //--Condicion pierde CPU
+    //--Condición pierde CPU
     if (sphere.position.y>borders[2].position.y){
       winner(sphere, "player1")
     }
@@ -207,7 +207,7 @@ Partes implementadas:
 
 
   //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
-  //--Pone las puntuaciones a 0 para comezar una nueva partida
+  //--Pone las puntuaciones a 0 para comenzar una nueva partida
   function newGame(id, id2){
     if (document.getElementById(id).innerHTML == 5){
       document.getElementById(id).innerHTML = 0;
@@ -219,7 +219,7 @@ Partes implementadas:
 
 
   //--Se le pasa la bola y el nombre del ganador
-  //--Comprueba si ha ganado un juego o ha ganado la partida
+  //--Comprueba si ha ganado un juego o ha ganado la partida y aumenta su marcador
   function winner(sphere, id){
     sphere.position.y = 0;
     sphere.position.x = 0;
@@ -236,7 +236,7 @@ Partes implementadas:
   }
 
 
-  //--Funcion movimiento de raqueta a la izquierda
+  //--Función movimiento de raqueta a la izquierda
   function racketMoveLeft(position_init,racket, wall, move){
     //--Desplazamiento de la raqueta
     var move = 0.25;
@@ -248,7 +248,7 @@ Partes implementadas:
   }
 
 
-  //--Funcion movimiento de raqueta a la derecha
+  //--Función movimiento de raqueta a la derecha
   function racketMoveRight(position_init, racket, wall){
     //--Desplazamiento de la raqueta
     var move = 0.25;
