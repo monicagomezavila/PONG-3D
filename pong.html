@@ -18,7 +18,7 @@ Partes implementadas:
   var stepX = 0.05 * numAleatorio(2,-1);
   var stepY = 0.15* numAleatorio(2,-1);
 
-  //--Boolean igual a true si le das a la tecla de espacio y empieza el juego
+  //--Boolean igual a true si le das a la tecla de espacio, empieza el juego
   //--Pasa a false cuando un CPU o USER ganan un juego
   var begin = false;
 
@@ -137,7 +137,7 @@ Partes implementadas:
       }
       //--Comenzará a moverse la bola cuando se pulse la tecla espacio
       if (event.key == " "){
-        //--Iniciliza cpulose cada juego (aleatorio)
+        //--Inicializa cpulose cada juego (aleatorio)
         cpulose = numAleatorio(5,2);
         begin = true;
         //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
@@ -179,7 +179,7 @@ Partes implementadas:
       }
     }
 
-    //--Condición pierde el USER
+    //--Condición pierde USER
     if (sphere.position.y<borders[3].position.y){
       winner(sphere,"cpu");
     }
@@ -207,9 +207,10 @@ Partes implementadas:
 
 
   //--Si en el juego anterior un jugador ya habia ganado los 5 juegos de una partida,
-  //--Pone las puntuaciones a 0 para comenzar una nueva partida
+  //--Pone las puntuaciones a 0 para comenzar una nueva
   function newGame(id, id2){
     if (document.getElementById(id).innerHTML == 5){
+      //--Elimina las puntuaciones del marcador
       document.getElementById(id).innerHTML = 0;
       document.getElementById(id2).innerHTML = 0;
       //--Elimina el letrero del ganador
@@ -225,7 +226,8 @@ Partes implementadas:
     sphere.position.x = 0;
     begin = false;
     if (document.getElementById(id).innerHTML == 4){
-      document.getElementById("winner").innerHTML = id + "wins!, pulse space for new game";
+      //--Si la puntuación era 4, al ganar ese juego, gana la partida
+      document.getElementById("winner").innerHTML = id + " wins!, pulse space for a new game";
       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
     }else{
       document.getElementById(id).innerHTML = 1+parseInt(document.getElementById(id).innerHTML);
@@ -342,7 +344,7 @@ Partes implementadas:
       }
     }else if ((positionX_down+(width_down/2) >= positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))<positionX_sphere)) {
       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-        console.log("choque lateral derecho");
+        console.log("choque derecho");
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
         stepY = (-1 * 0.4 * vel_total * Math.sign(stepY))*factor;
@@ -354,7 +356,7 @@ Partes implementadas:
       }
     }else if (((positionX_down-(width_down/2)+(width_down/3))<=positionX_sphere) && ((positionX_down+(width_down/2)-(width_down/3))>=positionX_sphere)) {
       if ((positionY_sphere-(radius_sphere/2))<= (positionY_down+(height_down/2))){
-        console.log("choque en el centro");
+        console.log("choque centro");
         var vel_total = Math.abs(stepX) + Math.abs(stepY);
         factor =  Scale_Factor_Y(positionX_down);
         stepY = (-1 * 0.6 * vel_total * Math.sign(stepY))*factor;
